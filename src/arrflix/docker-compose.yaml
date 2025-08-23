@@ -78,8 +78,8 @@ services:
     networks:
       - arrflix
     labels:
-      - homepage.group=Media Management
-      - homepage.name=sonarr
+      - homepage.group=Media
+      - homepage.name=Sonarr
       - homepage.icon=sonarr.png
       - homepage.href=http://home-ubuntu:8989
       - homepage.description=TV Series Management
@@ -108,7 +108,7 @@ services:
     networks:
       - arrflix
     labels:
-      - homepage.group=Media Management
+      - homepage.group=Media
       - homepage.name=radarr
       - homepage.icon=radarr.png
       - homepage.href=http://home-ubuntu:7878
@@ -139,7 +139,7 @@ services:
       - ${DATADIR}/media/tvshows:/data/tvshows:rw
       - ${DATADIR}/media/movies:/data/movies:rw
     labels:
-      - homepage.group=Media Management
+      - homepage.group=Media
       - homepage.name=bazarr
       - homepage.icon=bazarr.png
       - homepage.href=http://home-ubuntu:6767
