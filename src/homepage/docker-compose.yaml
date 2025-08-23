@@ -21,3 +21,22 @@ services:
       HOMEPAGE_ALLOWED_HOSTS: "*"
       LOG_TARGETS: /app/logs/homepage.log
     restart: unless-stopped
+  internet-speed:
+    image: germannewsmaker/myspeed
+    container_name: myspeed
+    ports:
+      - 5216:5216
+    networks:
+      - arrflix
+    volumes:
+      - /home/deds/myspeed/logs:/myspeed/data
+    environment:
+      TZ: ${TZ:-UTC}
+    restart: unless-stopped
+    labels:
+      - homepage.group=Deployment
+      - homepage.name=Internet Speed
+      - homepage.icon=myspeed.png
+      - homepage.url=http://home-ubuntu:5216
+      - homepage.widget.type=myspeed
+      - homepage.widget.url=http://myspeed:5216
