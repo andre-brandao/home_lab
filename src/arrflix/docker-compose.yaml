@@ -191,7 +191,7 @@ services:
     networks:
       - arrflix
     volumes:
-      - ${USERDIR}/docker/jellyseerr:/config
+      - ${USERDIR}/docker/jellyseerr:/app/config
       # - ${DATADIR}/media/tvshows:/data/tvshows
       # - ${DATADIR}/media/movies:/data/movies
     healthcheck:
