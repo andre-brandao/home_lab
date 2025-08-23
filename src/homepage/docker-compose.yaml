@@ -1,4 +1,6 @@
-version: "3.8"
+networks:
+  arrflix:
+    external: true
 
 services:
   homepage:
@@ -6,6 +8,8 @@ services:
     container_name: homepage
     ports:
       - 6969:3000
+    networks:
+      - arrflix
     volumes:
       - /home/deds/homepage/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
