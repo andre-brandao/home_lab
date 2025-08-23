@@ -1,0 +1,140 @@
+version: "3.3"
+networks:
+  internal:
+    driver: bridge
+
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+    volumes:
+      - ${USERDIR}/docker/qbittorrent:/config
+      # - ${USERDIR}/Downloads:/downloads
+      - ${DATADIR}/Downloads/completed:/data/completed
+      - ${DATADIR}/Downloads/incomplete:/data/incomplete
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+    networks:
+      - internal
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${USERDIR}/docker/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    networks:
+      - internal
+
+  sonarr:
+    image: mdhiggins/sonarr-sma
+    container_name: sonarr
+    volumes:
+      - ${USERDIR}/docker/sonarr:/config
+      - ${DATADIR}/Downloads/completed:/data/completed
+      - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
+      - /etc/localtime:/etc/localtime:ro
+      - ${USERDIR}/docker/certs:/certs
+      - ${DATADIR}/media/tvshows:/tvshows
+    ports:
+      - "8989:8989"
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    networks:
+      - internal
+
+  radarr:
+    image: mdhiggins/radarr-sma
+    container_name: radarr
+    volumes:
+      - ${USERDIR}/docker/radarr:/config
+      - ${DATADIR}/media/movies:/movies
+      - /etc/localtime:/etc/localtime:ro
+      - ${USERDIR}/docker/certs:/certs
+      - ${DATADIR}/Downloads/completed:/data/completed
+      - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
+    ports:
+      - "7878:7878"
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    networks:
+      - internal
+
+  bazarr:
+    container_name: bazarr
+    image: ghcr.io/hotio/bazarr:latest
+    restart: unless-stopped
+    # logging:
+    #   driver: json-file
+    # network_mode: bridge
+    networks:
+      - internal
+    ports:
+      - 6767:6767
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${USERDIR}/docker/bazarr:/config:rw
+      - ${DATADIR}/media/tvshows:/data/tvshows:rw
+      - ${DATADIR}/media/movies:/data/movies:rw
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${USERDIR}/docker/jellyfin:/config
+      - ${DATADIR}/media/tvshows:/data/tvshows
+      - ${DATADIR}/media/movies:/data/movies
+    ports:
+      - "8096:8096"
+      - "8920:8920" # Optional
+      - "7359:7359/udp" # Optional
+      - "1900:1900/udp" # Optional
+    restart: unless-stopped
+    networks:
+      - internal
+
+  # plexms:
+  #   container_name: plexms
+  #   restart: always
+  #   image: plexinc/pms-docker:plexpass
+  #   volumes:
+  #     - ${USERDIR}/docker/plexms:/config
+  #     - ${USERDIR}/Downloads/plex_tmp:/transcode
+  #     - ${USERDIR}/media:/media
+  #     - ${USERDIR}/docker/certs:/certs
+  #   network_mode: host
+  #   environment:
+  #     - TZ=${TZ}
+  #     - HOSTNAME=${PLEX_HOSTNAME}
+  #     - PLEX_CLAIM=${PLEX_CLAIM}
+  #     - PLEX_UID=${PUID}
+  #     - PLEX_GID=${PGID}
+  #     - ADVERTISE_IP=${PLEX_ADVERTISE_IP}
