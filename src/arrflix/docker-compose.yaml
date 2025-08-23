@@ -24,6 +24,12 @@ services:
     restart: unless-stopped
     networks:
       - internal
+    labels:
+      - homepage.group=Arr
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent.png
+      - homepage.href=http://home-ubuntu:8080
+      - homepage.description=Torrent client
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -39,6 +45,12 @@ services:
     restart: unless-stopped
     networks:
       - internal
+    labels:
+      - homepage.group=Arr
+      - homepage.name=prowlarr
+      - homepage.icon=prowlarr.png
+      - homepage.href=http://home-ubuntu:9696
+      - homepage.description=Indexer
 
   sonarr:
     image: mdhiggins/sonarr-sma
@@ -59,6 +71,12 @@ services:
       - TZ=${TZ}
     networks:
       - internal
+    labels:
+      - homepage.group=Arr
+      - homepage.name=sonarr
+      - homepage.icon=sonarr.png
+      - homepage.href=http://home-ubuntu:8989
+      - homepage.description=TV Series Management
 
   radarr:
     image: mdhiggins/radarr-sma
@@ -79,6 +97,12 @@ services:
       - TZ=${TZ}
     networks:
       - internal
+    labels:
+      - homepage.group=Arr
+      - homepage.name=radarr
+      - homepage.icon=radarr.png
+      - homepage.href=http://home-ubuntu:7878
+      - homepage.description=Movie Management
 
   bazarr:
     container_name: bazarr
@@ -100,6 +124,12 @@ services:
       - ${USERDIR}/docker/bazarr:/config:rw
       - ${DATADIR}/media/tvshows:/data/tvshows:rw
       - ${DATADIR}/media/movies:/data/movies:rw
+    labels:
+      - homepage.group=Arr
+      - homepage.name=bazarr
+      - homepage.icon=bazarr.png
+      - homepage.href=http://home-ubuntu:6767
+      - homepage.description=Subtitle Management
 
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
@@ -120,6 +150,12 @@ services:
     restart: unless-stopped
     networks:
       - internal
+    labels:
+      - homepage.group=Movies
+      - homepage.name=jellyfin
+      - homepage.icon=jellyfin.png
+      - homepage.href=http://home-ubuntu:8096
+      - homepage.description=Media Server
 
   # plexms:
   #   container_name: plexms
