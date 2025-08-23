@@ -1,6 +1,6 @@
 version: "3.3"
 networks:
-  internal:
+  arrflix:
     driver: bridge
 
 services:
@@ -22,7 +22,7 @@ services:
       - 6881:6881/udp
     restart: unless-stopped
     networks:
-      - internal
+      - arrflix
     labels:
       - homepage.group=Arr
       - homepage.name=qBittorrent
@@ -47,13 +47,16 @@ services:
       - 9696:9696
     restart: unless-stopped
     networks:
-      - internal
+      - arrflix
     labels:
       - homepage.group=Arr
       - homepage.name=prowlarr
       - homepage.icon=prowlarr.png
       - homepage.href=http://home-ubuntu:9696
       - homepage.description=Indexer
+      - homepage.widget.type=prowlarr
+      - homepage.widget.url=http://home-ubuntu:9696
+      - homepage.widget.key=${PROWLARR_KEY}
 
   sonarr:
     image: mdhiggins/sonarr-sma
@@ -73,13 +76,17 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     networks:
-      - internal
+      - arrflix
     labels:
-      - homepage.group=Arr
+      - homepage.group=Media Management
       - homepage.name=sonarr
       - homepage.icon=sonarr.png
       - homepage.href=http://home-ubuntu:8989
       - homepage.description=TV Series Management
+      - homepage.widget.type=sonarr
+      - homepage.widget.url=http://home-ubuntu:8989
+      - homepage.widget.key=${SONARR_KEY}
+      - homepage.widget.enableQueue=true
 
   radarr:
     image: mdhiggins/radarr-sma
@@ -99,13 +106,17 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     networks:
-      - internal
+      - arrflix
     labels:
-      - homepage.group=Arr
+      - homepage.group=Media Management
       - homepage.name=radarr
       - homepage.icon=radarr.png
       - homepage.href=http://home-ubuntu:7878
       - homepage.description=Movie Management
+      - homepage.widget.type=radarr
+      - homepage.widget.url=http://home-ubuntu:7878
+      - homepage.widget.key=${RADARR_KEY}
+      - homepage.widget.enableQueue=true
 
   bazarr:
     container_name: bazarr
@@ -115,7 +126,7 @@ services:
     #   driver: json-file
     # network_mode: bridge
     networks:
-      - internal
+      - arrflix
     ports:
       - 6767:6767
     environment:
@@ -128,11 +139,14 @@ services:
       - ${DATADIR}/media/tvshows:/data/tvshows:rw
       - ${DATADIR}/media/movies:/data/movies:rw
     labels:
-      - homepage.group=Arr
+      - homepage.group=Media Management
       - homepage.name=bazarr
       - homepage.icon=bazarr.png
       - homepage.href=http://home-ubuntu:6767
       - homepage.description=Subtitle Management
+      - homepage.widget.type=bazarr
+      - homepage.widget.url=http://home-ubuntu:6767
+      - homepage.widget.key=${BAZARR_KEY}
 
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
@@ -152,10 +166,14 @@ services:
       - "1900:1900/udp" # Optional
     restart: unless-stopped
     networks:
-      - internal
+      - arrflix
     labels:
       - homepage.group=Movies
       - homepage.name=jellyfin
       - homepage.icon=jellyfin.png
       - homepage.href=http://home-ubuntu:8096
       - homepage.description=Media Server
+      - homepage.widget.type=jellyfin
+      - homepage.widget.url=http://home-ubuntu:8096
+      - homepage.widget.key=${JELLYFIN_KEY}
+      - homepage.widget.enableBlocks=true
