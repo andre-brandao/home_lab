@@ -14,7 +14,6 @@ services:
       - WEBUI_PORT=8080
     volumes:
       - ${USERDIR}/docker/qbittorrent:/config
-      # - ${USERDIR}/Downloads:/downloads
       - ${DATADIR}/Downloads/completed:/data/completed
       - ${DATADIR}/Downloads/incomplete:/data/incomplete
     ports:
@@ -60,11 +59,11 @@ services:
     image: mdhiggins/sonarr-sma
     container_name: sonarr
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/sonarr:/config
+      - ${USERDIR}/docker/certs:/certs
       - ${DATADIR}/Downloads/completed:/data/completed
       - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
-      - /etc/localtime:/etc/localtime:ro
-      - ${USERDIR}/docker/certs:/certs
       - ${DATADIR}/media/tvshows:/tvshows
     ports:
       - "8989:8989"
@@ -86,12 +85,12 @@ services:
     image: mdhiggins/radarr-sma
     container_name: radarr
     volumes:
-      - ${USERDIR}/docker/radarr:/config
-      - ${DATADIR}/media/movies:/movies
       - /etc/localtime:/etc/localtime:ro
+      - ${USERDIR}/docker/radarr:/config
       - ${USERDIR}/docker/certs:/certs
       - ${DATADIR}/Downloads/completed:/data/completed
       - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
+      - ${DATADIR}/media/movies:/movies
     ports:
       - "7878:7878"
     restart: always
@@ -160,21 +159,3 @@ services:
       - homepage.icon=jellyfin.png
       - homepage.href=http://home-ubuntu:8096
       - homepage.description=Media Server
-
-  # plexms:
-  #   container_name: plexms
-  #   restart: always
-  #   image: plexinc/pms-docker:plexpass
-  #   volumes:
-  #     - ${USERDIR}/docker/plexms:/config
-  #     - ${USERDIR}/Downloads/plex_tmp:/transcode
-  #     - ${USERDIR}/media:/media
-  #     - ${USERDIR}/docker/certs:/certs
-  #   network_mode: host
-  #   environment:
-  #     - TZ=${TZ}
-  #     - HOSTNAME=${PLEX_HOSTNAME}
-  #     - PLEX_CLAIM=${PLEX_CLAIM}
-  #     - PLEX_UID=${PUID}
-  #     - PLEX_GID=${PGID}
-  #     - ADVERTISE_IP=${PLEX_ADVERTISE_IP}
