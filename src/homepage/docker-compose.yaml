@@ -17,3 +17,5 @@ services:
       HOMEPAGE_ALLOWED_HOSTS: "*"
       LOG_TARGETS: /app/logs/homepage.log
     restart: unless-stopped
+    networks:
+      - internal
