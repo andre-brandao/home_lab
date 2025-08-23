@@ -10,8 +10,8 @@ services:
       - /home/deds/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      PUID: ${PUID:-1000}
-      PGID: ${PGID:-1000}
+      # PUID: ${PUID:-1000}
+      # PGID: ${PGID:-1000}
       TZ: ${TZ:-UTC}
       HOMEPAGE_ALLOWED_HOSTS: "*"
     restart: unless-stopped
