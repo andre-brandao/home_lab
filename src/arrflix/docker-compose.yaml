@@ -120,7 +120,7 @@ services:
       - arrflix
     labels:
       - homepage.group=Media
-      - homepage.name=radarr
+      - homepage.name=Radarr
       - homepage.icon=radarr.png
       - homepage.href=http://home-ubuntu:7878
       - homepage.description=Movie Management

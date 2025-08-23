@@ -4,10 +4,10 @@
 showStats: true
 
 layout:
-    Arr:
-        style: row
-        columns: 3
+  Arr:
+    style: row
+    columns: 3
 
 providers:
-    openweathermap: openweathermapapikey
-    weatherapi: weatherapiapikey
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey

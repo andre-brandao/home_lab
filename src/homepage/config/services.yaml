@@ -2,8 +2,8 @@
 # For configuration options and examples, please see:
 # https://gethomepage.dev/configs/services/
 
-- calendar:
-    - agenda:
+- Calendar:
+    - Calendario:
         widget:
           type: calendar
           firstDayInWeek: sunday
@@ -14,13 +14,57 @@
             - type: sonarr
               service_group: Media
               service_name: Sonarr
-              color: teal
+              color: lime
+              params:
+                unmonitored: true
+            - type: radarr
+              service_group: Media
+              service_name: Radarr
+              color: lime
               params:
                 unmonitored: true
             - type: ical
               url: https://pucminas.instructure.com/feeds/calendars/user_4NoLBIDVbglwAb5xBPXWtY8FByRFJCHZGHSW9Bec.ics
               name: PUC
-              color: zinc
+              color: blue
+              params:
+                showName: true
+            - type: ical
+              url: https://calendar.google.com/calendar/ical/andre.brandao%40a3data.com.br/public/basic.ics
+              name: A3
+              color: yellow
+              params:
+                showName: true
+    - Agenda:
+        widget:
+          type: calendar
+          view: agenda
+          maxEvents: 10 # optional - defaults to 10
+          showTime: true # optional - show time for event happening today - defaults to false
+          previousDays: 3 # optional - shows events since three days ago - defaults to 0
+          integrations:
+            - type: sonarr
+              service_group: Media
+              service_name: Sonarr
+              color: lime
+              params:
+                unmonitored: true
+            - type: radarr
+              service_group: Media
+              service_name: Radarr
+              color: lime
+              params:
+                unmonitored: true
+            - type: ical
+              url: https://pucminas.instructure.com/feeds/calendars/user_4NoLBIDVbglwAb5xBPXWtY8FByRFJCHZGHSW9Bec.ics
+              name: PUC
+              color: blue
+              params:
+                showName: true
+            - type: ical
+              url: https://calendar.google.com/calendar/ical/andre.brandao%40a3data.com.br/public/basic.ics
+              name: A3
+              color: yellow
               params:
                 showName: true
 - Deployment:
