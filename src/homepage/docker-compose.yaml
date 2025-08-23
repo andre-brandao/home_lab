@@ -37,6 +37,6 @@ services:
       - homepage.group=Deployment
       - homepage.name=Internet Speed
       - homepage.icon=myspeed.png
-      - homepage.url=http://home-ubuntu:5216
+      - homepage.href=http://home-ubuntu:5216
       - homepage.widget.type=myspeed
       - homepage.widget.url=http://myspeed:5216
