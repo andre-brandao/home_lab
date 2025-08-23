@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - 6969:3000
+    volumes:
+      - /home/deds/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-UTC}
+      HOMEPAGE_ALLOWED_HOSTS: "*"
+    restart: unless-stopped
