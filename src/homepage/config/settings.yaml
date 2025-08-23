@@ -1,0 +1,13 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/settings/
+showStats: true
+
+layout:
+    Arr:
+        style: row
+        columns: 3
+
+providers:
+    openweathermap: openweathermapapikey
+    weatherapi: weatherapiapikey

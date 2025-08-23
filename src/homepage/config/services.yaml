@@ -1,0 +1,7 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+- Deployment:
+    - DokPloy:
+        icon: docker.png
+        href: http://home-ubuntu:3000

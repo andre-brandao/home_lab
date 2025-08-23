@@ -30,6 +30,10 @@ services:
       - homepage.icon=qbittorrent.png
       - homepage.href=http://home-ubuntu:8080
       - homepage.description=Torrent client
+      - homepage.widget.type=qbittorrent
+      - homepage.widget.url=http://home-ubuntu:8080
+      - homepage.widget.username=admin
+      - homepage.widget.password=${HTTP_PASSWORD}
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
