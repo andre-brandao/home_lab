@@ -194,11 +194,11 @@ services:
       - homepage.widget.enableBlocks=true
       - traefik.enable=true
       - traefik.docker.network=dokploy-network
-      - traefik.http.routers.jellyfin.entrypoints=http
+      - traefik.http.routers.jellyfin.entrypoints=web
       - traefik.http.routers.jellyfin.rule=Host(`flix.adob.dev`)
       - traefik.http.middlewares.jellyfin-https-redirect.redirectscheme.scheme=https
       - traefik.http.routers.jellyfin.middlewares=jellyfin-https-redirect
-      - traefik.http.routers.jellyfin-secure.entrypoints=https
+      - traefik.http.routers.jellyfin-secure.entrypoints=websecure
       - traefik.http.routers.jellyfin-secure.rule=Host(`flix.adob.dev`)
       - traefik.http.routers.jellyfin-secure.tls=true
       - traefik.http.routers.jellyfin-secure.tls.certresolver=letsencrypt
