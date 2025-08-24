@@ -2,7 +2,7 @@ networks:
   arrflix:
     driver: bridge
     name: arrflix
-  dokploy-network:
+  proxy:
     external: true
 
 services:
@@ -181,7 +181,7 @@ services:
     restart: unless-stopped
     networks:
       - arrflix
-      - dokploy-network
+      - proxy
     labels:
       - homepage.group=Movies
       - homepage.name=jellyfin
@@ -193,7 +193,7 @@ services:
       - homepage.widget.key=${JELLYFIN_KEY}
       - homepage.widget.enableBlocks=true
       - traefik.enable=true
-      - traefik.docker.network=dokploy-network
+      - traefik.docker.network=proxy
       - traefik.http.routers.jellyfin.entrypoints=http
       - traefik.http.routers.jellyfin.rule=Host(`flix.adob.dev`)
       - traefik.http.middlewares.jellyfin-https-redirect.redirectscheme.scheme=https
@@ -218,7 +218,7 @@ services:
       - 5055:5055
     networks:
       - arrflix
-      - dokploy-network
+      - proxy
     volumes:
       - ${USERDIR}/docker/jellyseerr:/app/config
       # - ${DATADIR}/media/tvshows:/data/tvshows
@@ -240,7 +240,7 @@ services:
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_KEY}
       - traefik.enable=true
-      - traefik.docker.network=dokploy-network
+      - traefik.docker.network=proxy
       - traefik.http.routers.jellyseerr.entrypoints=http
       - traefik.http.routers.jellyseerr.rule=Host(`flixrequest.adob.dev`)
       - traefik.http.middlewares.jellyseerr-https-redirect.redirectscheme.scheme=https
