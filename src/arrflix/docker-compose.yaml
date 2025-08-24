@@ -214,7 +214,7 @@ services:
       - traefik.http.routers.jellyfin-secure.tls=true
       - traefik.http.routers.jellyfin-secure.tls.certresolver=cloudflare
       - traefik.http.routers.jellyfin-secure.service=jellyfin-dedsflix-arr-jrx17b
-      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+      - traefik.http.services.jellyfin-dedsflix-arr-jrx17b.loadbalancer.server.port=8096
 
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
