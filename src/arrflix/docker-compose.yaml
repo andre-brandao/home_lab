@@ -24,13 +24,13 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=5656
     volumes:
       - ${USERDIR}/docker/qbittorrent:/config
       - ${DATADIR}/Downloads/completed:/data/completed
       - ${DATADIR}/Downloads/incomplete:/data/incomplete
     ports:
-      - 8080:8080
+      - 5656:5656
       - 6881:6881
       - 6881:6881/udp
     restart: unless-stopped
@@ -40,10 +40,10 @@ services:
       - homepage.group=Arr
       - homepage.name=qBittorrent
       - homepage.icon=qbittorrent.png
-      - homepage.href=http://home-ubuntu:8080
+      - homepage.href=http://home-ubuntu:5656
       - homepage.description=Torrent client
       - homepage.widget.type=qbittorrent
-      - homepage.widget.url=http://qbittorrent:8080
+      - homepage.widget.url=http://qbittorrent:5656
       - homepage.widget.username=admin
       - homepage.widget.password=${HTTP_PASSWORD}
       - homepage.widget.enableLeechProgress=true
