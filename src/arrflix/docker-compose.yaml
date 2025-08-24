@@ -2,6 +2,8 @@ networks:
   arrflix:
     driver: bridge
     name: arrflix
+  dokploy-network:
+    external: true
 
 services:
   # gluetun:
@@ -179,6 +181,7 @@ services:
     restart: unless-stopped
     networks:
       - arrflix
+      - dokploy-network
     labels:
       - homepage.group=Movies
       - homepage.name=jellyfin
@@ -189,6 +192,12 @@ services:
       - homepage.widget.url=http://jellyfin:8096
       - homepage.widget.key=${JELLYFIN_KEY}
       - homepage.widget.enableBlocks=true
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.rule=Host(`flix.adob.dev`)
+      - traefik.http.routers.jellyfin.entrypoints=http
+      - traefik.docker.network=dokploy-network
+      # - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
@@ -202,6 +211,7 @@ services:
       - 5055:5055
     networks:
       - arrflix
+      - dokploy-network
     volumes:
       - ${USERDIR}/docker/jellyseerr:/app/config
       # - ${DATADIR}/media/tvshows:/data/tvshows
@@ -222,3 +232,7 @@ services:
       - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_KEY}
+      - traefik.enable=true
+      - traefik.http.routers.jellyseerr.rule=Host(`flixrequest.adob.dev`)
+      - traefik.http.routers.jellyseerr.entrypoints=http
+      - traefik.docker.network=dokploy-network
