@@ -240,6 +240,13 @@ services:
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=${JELLYSEERR_KEY}
       - traefik.enable=true
-      - traefik.http.routers.jellyseerr.rule=Host(`flixrequest.adob.dev`)
-      - traefik.http.routers.jellyseerr.entrypoints=http
       - traefik.docker.network=dokploy-network
+      - traefik.http.routers.jellyfin.entrypoints=web
+      - traefik.http.routers.jellyfin.rule=Host(`flixrequest.adob.dev`)
+      - traefik.http.middlewares.jellyfin-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.jellyfin.middlewares=jellyfin-https-redirect
+      - traefik.http.routers.jellyfin-secure.entrypoints=websecure
+      - traefik.http.routers.jellyfin-secure.rule=Host(`flixrequest.adob.dev`)
+      - traefik.http.routers.jellyfin-secure.tls=true
+      - traefik.http.routers.jellyfin-secure.tls.certresolver=letsencrypt
+      - traefik.http.routers.jellyfin-secure.service=jellyseerr-dedsflix-arr-jrx17b
