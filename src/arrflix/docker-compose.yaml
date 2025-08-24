@@ -202,7 +202,7 @@ services:
       - traefik.http.routers.jellyfin-secure.rule=Host(`flix.adob.dev`)
       - traefik.http.routers.jellyfin-secure.tls=true
       - traefik.http.routers.jellyfin-secure.tls.certresolver=letsencrypt
-      - traefik.http.routers.jellyfin-secure.service=jellyfin
+      - traefik.http.routers.jellyfin-secure.service=dedsflix-arr-jrx17b
       # - traefik.http.services.jellyfin.loadbalancer.server.port=8096
 
   jellyseerr:
