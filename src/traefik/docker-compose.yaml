@@ -4,7 +4,7 @@
 
 networks:
   proxy:
-    # external: true
+    external: true
 
 services:
   traefik:
@@ -16,7 +16,7 @@ services:
     # secrets:
     #   - cf-token # the secret at the top of this file
     environment:
-      - TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
+      # - TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
       - CF_API_EMAIL=${CF_EMAIL}
       - CF_DNS_API_TOKEN=${CF_TOKEN}
     networks:
@@ -25,9 +25,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
       # ----
-      - /home/deds/traefik/traefik.yaml:/traefik.yaml:ro
-      - /home/deds/traefik/acme.json:/acme.json
-      - /home/deds/traefik/config.yaml:/config.yaml:ro
+      - /home/deds/traefik/config/traefik.yaml:/traefik.yaml:ro
+      - /home/deds/traefik/config/acme.json:/acme.json
+      - /home/deds/traefik/config/config.yaml:/config.yaml:ro
       - /home/deds/traefik/logs:/var/log/traefik
     ports:
       - "80:80/tcp"
@@ -48,7 +48,7 @@ services:
       - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
       - "traefik.http.routers.traefik-secure.entrypoints=https"
       - "traefik.http.routers.traefik-secure.rule=Host(`traefik.adob.dev`)"
-      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      # - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
       - "traefik.http.routers.traefik-secure.tls.domains[0].main=adob.dev"
