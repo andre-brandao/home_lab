@@ -44,6 +44,7 @@ services:
       - homepage.widget.url=http://qbittorrent:8080
       - homepage.widget.username=admin
       - homepage.widget.password=${HTTP_PASSWORD}
+      - homepage.widget.enableLeechProgress=true
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest

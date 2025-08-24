@@ -4,7 +4,11 @@
 showStats: true
 
 layout:
-  Arr:
+  - Calendar:
+  - Movies:
+    
+  - Media:
+  - Arr:
     style: row
     columns: 3
 

@@ -5,10 +5,31 @@
 - resources:
     cpu: true
     memory: true
+    uptime: true
     disk:
       - /
-      - /mnt/arr
+      - /mnt/arr/media
 
 - search:
-    provider: duckduckgo
+    provider:
+      - duckduckgo
+      - google
+      - brave
     target: _blank
+
+- datetime:
+    text_size: xl
+    format:
+      dateStyle: short
+      timeStyle: short
+      hour12: true
+
+- openmeteo:
+    label: Belo Horizonte
+    latitude: -19.9199
+    longitude: -43.9423
+    timezone: America/Sao_Paulo
+    units: metric
+    cache: 5
+    format:
+      maximumFractionDigits: 1

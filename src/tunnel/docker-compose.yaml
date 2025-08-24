@@ -7,11 +7,11 @@ services:
     environment:
       - "TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}" # don't forget to set this in Dokploy Environment
     network_mode: host
-    labels:
-      - homepage.group=Deployment
-      - homepage.title=Cloudflare Tunnel
-      - homepage.icon=cloudflare.png
-      - homepage.widget.type=cloudflared
-      - homepage.widget.accountid=${CLOUDFLARE_ACCOUNT_ID}
-      - homepage.widget.tunnelid=${CLOUDFLARE_TUNNEL_ID}
-      - homepage.widget.key=${CLOUDFLARE_TUNNEL_KEY}
+    # labels:
+    # - homepage.group=Deployment
+    # - homepage.title=Cloudflare Tunnel
+    # - homepage.icon=cloudflare.png
+    # - homepage.widget.type=cloudflared
+    # - homepage.widget.accountid=${CLOUDFLARE_ACCOUNT_ID}
+    # - homepage.widget.tunnelid=${CLOUDFLARE_TUNNEL_ID}
+    # - homepage.widget.key=${CLOUDFLARE_TUNNEL_KEY}
