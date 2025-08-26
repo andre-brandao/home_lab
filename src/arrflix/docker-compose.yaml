@@ -133,7 +133,7 @@ services:
           subpath: sonarr
       - type: volume
         source: configuration
-        target: certs
+        target: /certs
         volume:
           nocopy: true
           subpath: certs
@@ -177,7 +177,7 @@ services:
           subpath: radarr
       - type: volume
         source: configuration
-        target: certs
+        target: /certs
         volume:
           nocopy: true
           subpath: certs
