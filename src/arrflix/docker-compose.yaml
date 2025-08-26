@@ -61,7 +61,7 @@ services:
       # - ${USERDIR}/docker/qbittorrent:/config
       - type: volume
         source: configuration
-        target: config
+        target: /config
         volume:
           nocopy: true
           subpath: qbittorrent
@@ -99,7 +99,7 @@ services:
       # - ${USERDIR}/docker/prowlarr:/config
       - type: volume
         source: configuration
-        target: config
+        target: /config
         volume:
           nocopy: true
           subpath: prowlarr
@@ -127,7 +127,7 @@ services:
       # - ${USERDIR}/docker/certs:/certs
       - type: volume
         source: configuration
-        target: config
+        target: /config
         volume:
           nocopy: true
           subpath: sonarr
@@ -171,7 +171,7 @@ services:
       # - ${USERDIR}/docker/certs:/certs
       - type: volume
         source: configuration
-        target: config
+        target: /config
         volume:
           nocopy: true
           subpath: radarr
@@ -226,7 +226,7 @@ services:
       # - ${USERDIR}/docker/bazarr:/config:rw
       - type: volume
         source: configuration
-        target: config
+        target: /config
         volume:
           nocopy: true
           subpath: bazarr
@@ -254,7 +254,7 @@ services:
     volumes:
       - type: volume
         source: configuration
-        target: config
+        target: /config
         volume:
           nocopy: true
           subpath: jellyfin
