@@ -5,6 +5,32 @@ networks:
   proxy:
     external: true
 
+volumes:
+  media_shows:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/media/tvshows
+  media_movies:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/media/movies
+  downloads_complete:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/Downloads/completed
+  downloads_incomplete:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/Downloads/incomplete
+
 services:
   # gluetun:
   #   image: qmcgaw/gluetun
@@ -27,8 +53,10 @@ services:
       - WEBUI_PORT=5656
     volumes:
       - ${USERDIR}/docker/qbittorrent:/config
-      - ${DATADIR}/Downloads/completed:/data/completed
-      - ${DATADIR}/Downloads/incomplete:/data/incomplete
+      # - ${DATADIR}/Downloads/completed:/data/completed
+      # - ${DATADIR}/Downloads/incomplete:/data/incomplete
+      - downloads_complete:/data/completed
+      - downloads_incomplete:/data/incomplete
     ports:
       - 5656:5656
       - 6881:6881
@@ -79,9 +107,11 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/sonarr:/config
       - ${USERDIR}/docker/certs:/certs
-      - ${DATADIR}/Downloads/completed:/data/completed
-      - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
-      - ${DATADIR}/media/tvshows:/tvshows
+      # - ${DATADIR}/Downloads/completed:/data/completed
+      # - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
+      # - ${DATADIR}/media/tvshows:/tvshows
+      - downloads_complete:/data/completed
+      - media_shows:/tvshows
     ports:
       - "8989:8989"
     restart: always
@@ -109,9 +139,11 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/radarr:/config
       - ${USERDIR}/docker/certs:/certs
-      - ${DATADIR}/Downloads/completed:/data/completed
-      - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
-      - ${DATADIR}/media/movies:/movies
+      # - ${DATADIR}/Downloads/completed:/data/completed
+      # - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
+      # - ${DATADIR}/media/movies:/movies
+      - downloads_complete:/data/completed
+      - media_movies:/movies
     ports:
       - "7878:7878"
     restart: always
@@ -150,8 +182,10 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${USERDIR}/docker/bazarr:/config:rw
-      - ${DATADIR}/media/tvshows:/tvshows
-      - ${DATADIR}/media/movies:/movies
+      # - ${DATADIR}/media/tvshows:/tvshows
+      # - ${DATADIR}/media/movies:/movies
+      - media_shows:/tvshows
+      - media_movies:/movies
     labels:
       - homepage.group=Media
       - homepage.name=bazarr
@@ -171,8 +205,10 @@ services:
       - TZ=${TZ}
     volumes:
       - ${USERDIR}/docker/jellyfin:/config
-      - ${DATADIR}/media/tvshows:/data/tvshows
-      - ${DATADIR}/media/movies:/data/movies
+      # - ${DATADIR}/media/tvshows:/data/tvshows
+      # - ${DATADIR}/media/movies:/data/movies
+      - media_shows:/data/tvshows
+      - media_movies:/data/movies
       # ./assets/img/:/usr/share/jellyfin/web/assets/img/
       # ./assets/splash/:/usr/share/jellyfin/web/assets/spash/
 
@@ -224,8 +260,6 @@ services:
       - proxy
     volumes:
       - ${USERDIR}/docker/jellyseerr:/app/config
-      # - ${DATADIR}/media/tvshows:/data/tvshows
-      # - ${DATADIR}/media/movies:/data/movies
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
