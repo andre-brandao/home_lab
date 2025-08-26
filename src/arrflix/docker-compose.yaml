@@ -173,6 +173,9 @@ services:
       - ${USERDIR}/docker/jellyfin:/config
       - ${DATADIR}/media/tvshows:/data/tvshows
       - ${DATADIR}/media/movies:/data/movies
+      # ./assets/img/:/usr/share/jellyfin/web/assets/img/
+      # ./assets/splash/:/usr/share/jellyfin/web/assets/spash/
+
     ports:
       - "8096:8096"
       - "8920:8920" # Optional

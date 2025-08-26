@@ -12,7 +12,7 @@ services:
     container_name: traefik
     restart: unless-stopped
     security_opt:
-      - no-new-privileges:true # helps to increase security
+      - no-new-privileges:true
     # secrets:
     #   - cf-token # the secret at the top of this file
     environment:
@@ -37,9 +37,9 @@ services:
     labels:
       - homepage.group=Deployment
       - homepage.name=Traefik
+      - homepage.description=Reverse proxy and load balancer
       - homepage.icon=traefik.png
       - homepage.href=http://home-ubuntu:8080
-      - homepage.description=Reverse proxy and load balancer
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.rule=Host(`traefik.adob.dev`)"
@@ -61,7 +61,7 @@ services:
     restart: unless-stopped
     command: "tunnel --no-autoupdate run"
     environment:
-      - "TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}" # don't forget to set this in Dokploy Environment
+      - "TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}"
     networks:
       - proxy
 
