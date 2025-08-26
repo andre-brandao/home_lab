@@ -6,6 +6,12 @@ networks:
     external: true
 
 volumes:
+  configuration:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${USERDIR}/docker
   media_shows:
     driver: local
     driver_opts:
@@ -42,7 +48,7 @@ services:
   #     - VPN_SERVICE_PROVIDER=protonvpn
   #     - VPN_TYPE=wireguard
   #     # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-  #     # - SERVER_COUNTRIES=Netherlands
+  #     # - SERVER_COUNTRIES=Brazil
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -52,7 +58,13 @@ services:
       - TZ=${TZ}
       - WEBUI_PORT=5656
     volumes:
-      - ${USERDIR}/docker/qbittorrent:/config
+      # - ${USERDIR}/docker/qbittorrent:/config
+      - type: volume
+        source: configuration
+        target: config
+        volume:
+          nocopy: true
+          subpath: qbittorrent
       # - ${DATADIR}/Downloads/completed:/data/completed
       # - ${DATADIR}/Downloads/incomplete:/data/incomplete
       - downloads_complete:/data/completed
@@ -84,7 +96,13 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${USERDIR}/docker/prowlarr:/config
+      # - ${USERDIR}/docker/prowlarr:/config
+      - type: volume
+        source: configuration
+        target: config
+        volume:
+          nocopy: true
+          subpath: prowlarr
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -105,8 +123,20 @@ services:
     container_name: sonarr
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${USERDIR}/docker/sonarr:/config
-      - ${USERDIR}/docker/certs:/certs
+      # - ${USERDIR}/docker/sonarr:/config
+      # - ${USERDIR}/docker/certs:/certs
+      - type: volume
+        source: configuration
+        target: config
+        volume:
+          nocopy: true
+          subpath: sonarr
+      - type: volume
+        source: configuration
+        target: certs
+        volume:
+          nocopy: true
+          subpath: certs
       # - ${DATADIR}/Downloads/completed:/data/completed
       # - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
       # - ${DATADIR}/media/tvshows:/tvshows
@@ -137,8 +167,20 @@ services:
     container_name: radarr
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${USERDIR}/docker/radarr:/config
-      - ${USERDIR}/docker/certs:/certs
+      # - ${USERDIR}/docker/radarr:/config
+      # - ${USERDIR}/docker/certs:/certs
+      - type: volume
+        source: configuration
+        target: config
+        volume:
+          nocopy: true
+          subpath: radarr
+      - type: volume
+        source: configuration
+        target: certs
+        volume:
+          nocopy: true
+          subpath: certs
       # - ${DATADIR}/Downloads/completed:/data/completed
       # - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
       # - ${DATADIR}/media/movies:/movies
@@ -181,7 +223,13 @@ services:
       - TZ=${TZ}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ${USERDIR}/docker/bazarr:/config:rw
+      # - ${USERDIR}/docker/bazarr:/config:rw
+      - type: volume
+        source: configuration
+        target: config
+        volume:
+          nocopy: true
+          subpath: bazarr
       # - ${DATADIR}/media/tvshows:/tvshows
       # - ${DATADIR}/media/movies:/movies
       - media_shows:/tvshows
@@ -204,7 +252,13 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${USERDIR}/docker/jellyfin:/config
+      - type: volume
+        source: configuration
+        target: config
+        volume:
+          nocopy: true
+          subpath: jellyfin
+      # - ${USERDIR}/docker/jellyfin:/config
       # - ${DATADIR}/media/tvshows:/data/tvshows
       # - ${DATADIR}/media/movies:/data/movies
       - media_shows:/data/tvshows
@@ -259,7 +313,13 @@ services:
       - arrflix
       - proxy
     volumes:
-      - ${USERDIR}/docker/jellyseerr:/app/config
+      # - ${USERDIR}/docker/jellyseerr:/app/config
+      - type: volume
+        source: configuration
+        target: /app/config
+        volume:
+          nocopy: true
+          subpath: jellyseerr
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
       start_period: 20s
