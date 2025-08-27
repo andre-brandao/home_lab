@@ -1,3 +1,5 @@
+name: arrflix
+
 networks:
   arrflix:
     driver: bridge
@@ -58,15 +60,12 @@ services:
       - TZ=${TZ}
       - WEBUI_PORT=5656
     volumes:
-      # - ${USERDIR}/docker/qbittorrent:/config
       - type: volume
         source: configuration
         target: /config
         volume:
           nocopy: true
           subpath: qbittorrent
-      # - ${DATADIR}/Downloads/completed:/data/completed
-      # - ${DATADIR}/Downloads/incomplete:/data/incomplete
       - downloads_complete:/data/completed
       - downloads_incomplete:/data/incomplete
     ports:
@@ -96,7 +95,6 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      # - ${USERDIR}/docker/prowlarr:/config
       - type: volume
         source: configuration
         target: /config
@@ -119,27 +117,16 @@ services:
       - homepage.widget.key=${PROWLARR_KEY}
 
   sonarr:
-    image: mdhiggins/sonarr-sma
+    image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      # - ${USERDIR}/docker/sonarr:/config
-      # - ${USERDIR}/docker/certs:/certs
       - type: volume
         source: configuration
         target: /config
         volume:
           nocopy: true
           subpath: sonarr
-      # - type: volume
-      #   source: configuration
-      #   target: /certs
-      #   volume:
-      #     nocopy: true
-      #     subpath: certs
-      # - ${DATADIR}/Downloads/completed:/data/completed
-      # - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
-      # - ${DATADIR}/media/tvshows:/tvshows
       - downloads_complete:/data/completed
       - media_shows:/tvshows
     ports:
@@ -163,7 +150,7 @@ services:
       - homepage.widget.enableQueue=true
 
   radarr:
-    image: mdhiggins/radarr-sma
+    image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -175,15 +162,6 @@ services:
         volume:
           nocopy: true
           subpath: radarr
-      # - type: volume
-      #   source: configuration
-      #   target: /certs
-      #   volume:
-      #     nocopy: true
-      #     subpath: certs
-      # - ${DATADIR}/Downloads/completed:/data/completed
-      # - ${DATADIR}/Downloads/completed/recyclingBin:/data/completed/recyclingBin
-      # - ${DATADIR}/media/movies:/movies
       - downloads_complete:/data/completed
       - media_movies:/movies
     ports:
@@ -208,7 +186,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: ghcr.io/hotio/bazarr:latest
+    image: lscr.io/linuxserver/bazarr:latest
     restart: unless-stopped
     # logging:
     #   driver: json-file
@@ -223,15 +201,12 @@ services:
       - TZ=${TZ}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      # - ${USERDIR}/docker/bazarr:/config:rw
       - type: volume
         source: configuration
         target: /config
         volume:
           nocopy: true
           subpath: bazarr
-      # - ${DATADIR}/media/tvshows:/tvshows
-      # - ${DATADIR}/media/movies:/movies
       - media_shows:/tvshows
       - media_movies:/movies
     labels:
@@ -258,9 +233,6 @@ services:
         volume:
           nocopy: true
           subpath: jellyfin
-      # - ${USERDIR}/docker/jellyfin:/config
-      # - ${DATADIR}/media/tvshows:/data/tvshows
-      # - ${DATADIR}/media/movies:/data/movies
       - media_shows:/data/tvshows
       - media_movies:/data/movies
       # ./assets/img/:/usr/share/jellyfin/web/assets/img/
@@ -313,7 +285,6 @@ services:
       - arrflix
       - proxy
     volumes:
-      # - ${USERDIR}/docker/jellyseerr:/app/config
       - type: volume
         source: configuration
         target: /app/config
