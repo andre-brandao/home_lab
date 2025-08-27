@@ -75,6 +75,7 @@ services:
     restart: unless-stopped
     networks:
       - arrflix
+      - proxy
     labels:
       - homepage.group=Arr
       - homepage.name=qBittorrent
@@ -86,6 +87,18 @@ services:
       - homepage.widget.username=admin
       - homepage.widget.password=${HTTP_PASSWORD}
       - homepage.widget.enableLeechProgress=true
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.qbittorrent.entrypoints=http
+      - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.adob.dev`)
+      - traefik.http.middlewares.qbittorrent-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.qbittorrent.middlewares=qbittorrent-https-redirect
+      - traefik.http.routers.qbittorrent-secure.entrypoints=https
+      - traefik.http.routers.qbittorrent-secure.rule=Host(`qbittorrent.adob.dev`)
+      - traefik.http.routers.qbittorrent-secure.tls=true
+      - traefik.http.routers.qbittorrent-secure.tls.certresolver=cloudflare
+      - traefik.http.routers.qbittorrent-secure.service=401b2a0ad0dc_qbittorrent
+      - traefik.http.services.401b2a0ad0dc_qbittorrent.loadbalancer.server.port=9696
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -106,6 +119,7 @@ services:
     restart: unless-stopped
     networks:
       - arrflix
+      - proxy
     labels:
       - homepage.group=Arr
       - homepage.name=prowlarr
@@ -115,6 +129,18 @@ services:
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696
       - homepage.widget.key=${PROWLARR_KEY}
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.prowlarr.entrypoints=http
+      - traefik.http.routers.prowlarr.rule=Host(`prowlarr.adob.dev`)
+      - traefik.http.middlewares.prowlarr-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.prowlarr.middlewares=prowlarr-https-redirect
+      - traefik.http.routers.prowlarr-secure.entrypoints=https
+      - traefik.http.routers.prowlarr-secure.rule=Host(`prowlarr.adob.dev`)
+      - traefik.http.routers.prowlarr-secure.tls=true
+      - traefik.http.routers.prowlarr-secure.tls.certresolver=cloudflare
+      - traefik.http.routers.prowlarr-secure.service=88ef6e313635_prowlarr
+      - traefik.http.services.88ef6e313635_prowlarr.loadbalancer.server.port=9696
 
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
@@ -138,6 +164,7 @@ services:
       - TZ=${TZ}
     networks:
       - arrflix
+      - proxy
     labels:
       - homepage.group=Media
       - homepage.name=Sonarr
@@ -148,6 +175,18 @@ services:
       - homepage.widget.url=http://sonarr:8989
       - homepage.widget.key=${SONARR_KEY}
       - homepage.widget.enableQueue=true
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.sonarr.entrypoints=http
+      - traefik.http.routers.sonarr.rule=Host(`sonarr.adob.dev`)
+      - traefik.http.middlewares.sonarr-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.sonarr.middlewares=sonarr-https-redirect
+      - traefik.http.routers.sonarr-secure.entrypoints=https
+      - traefik.http.routers.sonarr-secure.rule=Host(`sonarr.adob.dev`)
+      - traefik.http.routers.sonarr-secure.tls=true
+      - traefik.http.routers.sonarr-secure.tls.certresolver=cloudflare
+      - traefik.http.routers.sonarr-secure.service=sonarr
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
 
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -183,6 +222,18 @@ services:
       - homepage.widget.url=http://radarr:7878
       - homepage.widget.key=${RADARR_KEY}
       - homepage.widget.enableQueue=true
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.radarr.entrypoints=http
+      - traefik.http.routers.radarr.rule=Host(`radarr.adob.dev`)
+      - traefik.http.middlewares.radarr-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.radarr.middlewares=radarr-https-redirect
+      - traefik.http.routers.radarr-secure.entrypoints=https
+      - traefik.http.routers.radarr-secure.rule=Host(`radarr.adob.dev`)
+      - traefik.http.routers.radarr-secure.tls=true
+      - traefik.http.routers.radarr-secure.tls.certresolver=cloudflare
+      - traefik.http.routers.radarr-secure.service=radarr
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
 
   bazarr:
     container_name: bazarr
@@ -193,6 +244,7 @@ services:
     # network_mode: bridge
     networks:
       - arrflix
+      - proxy
     ports:
       - 6767:6767
     environment:
@@ -218,6 +270,18 @@ services:
       - homepage.widget.type=bazarr
       - homepage.widget.url=http://bazarr:6767
       - homepage.widget.key=${BAZARR_KEY}
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.bazarr.entrypoints=http
+      - traefik.http.routers.bazarr.rule=Host(`bazarr.adob.dev`)
+      - traefik.http.middlewares.bazarr-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.bazarr.middlewares=bazarr-https-redirect
+      - traefik.http.routers.bazarr-secure.entrypoints=https
+      - traefik.http.routers.bazarr-secure.rule=Host(`bazarr.adob.dev`)
+      - traefik.http.routers.bazarr-secure.tls=true
+      - traefik.http.routers.bazarr-secure.tls.certresolver=cloudflare
+      - traefik.http.routers.bazarr-secure.service=bazarr
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
 
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
