@@ -112,7 +112,7 @@ services:
       - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
       - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && Path(`/qbittorrent`)
       - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
-      - traefik.http.services.qbittorrent.loadbalancer.server.port=9696
+      - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest

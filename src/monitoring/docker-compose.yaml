@@ -10,10 +10,14 @@ services:
   prometheus:
     image: prom/prometheus:v2.52.0
     container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.size=15GB"
+      - "--storage.tsdb.retention.time=15d"
+      # - "--storage.tsdb.wal-compression"
     ports:
       - "9090:9090"
-    # volumes:
-    #   - ./prometheus.yml:/etc/prometheus/prometheus.yml
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus-storage:/prometheus
