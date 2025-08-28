@@ -3,6 +3,8 @@ networks:
     external: true
   proxy:
     external: true
+  monitoring:
+    external: true
 services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
