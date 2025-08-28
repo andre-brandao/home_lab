@@ -53,7 +53,7 @@ services:
       - 6881:6881/udp # port for qbit port forward if your VPN supports this
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
-      - VPN_TYPE=wireguard
+      # - VPN_TYPE=wireguard
       # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
       - OPENVPN_USER=${OPENVPN_USER}
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
