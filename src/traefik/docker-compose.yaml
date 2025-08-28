@@ -13,32 +13,6 @@ services:
     image: traefik:v3.3
     container_name: traefik
     restart: unless-stopped
-    # command:
-    # - "--api.dashboard=true"
-    # - "--api.debug=true"
-    # - "--api.insecure=true"
-    # - "--entrypoints.http.address=:80"
-    # - "--entrypoints.http.http.redirections.entrypoint.to=https"
-    # - "--entrypoints.http.http.redirections.entrypoint.scheme=https"
-    # - "--entrypoints.https.address=:444"
-    # - "--entrypoints.metrics.address=:8082"
-    # - "--entrypoints.tailscale.address=:443"
-    # - "--serversTransport.insecureSkipVerify=true"
-    # - "--providers.docker.endpoint=unix:///var/run/docker.sock"
-    # - "--providers.docker.exposedbydefault=false"
-    # - "--providers.file.filename=/config.yaml"
-    # - "--certificatesresolvers.vpnresolver.tailscale=true"
-    # - "--certificatesresolvers.cloudflare.acme.email=eu+cloudflare@andrebrandao.dev"
-    # - "--certificatesresolvers.cloudflare.acme.storage=acme.json"
-    # - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
-    # - "--certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53"
-    # - "--log.level=INFO"
-    # - "--log.filepath=/var/log/traefik/traefik.log"
-    # - "--accesslog.filepath=/var/log/traefik/access.log"
-    # - "--metrics.prometheus.entrypoint=metrics"
-    # - "--metrics.prometheus.addserviceslabels=true"
-    # - "--metrics.prometheus.addentrypointslabels=true"
-    # - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
 
     security_opt:
       - no-new-privileges:true

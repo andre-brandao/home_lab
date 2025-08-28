@@ -33,3 +33,9 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ["cloudflared:2000"]
+
+  - job_name: "jaeger"
+    scrape_interval: 15s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["jaeger:8889"]

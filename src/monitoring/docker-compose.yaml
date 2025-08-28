@@ -77,3 +77,28 @@ services:
       - homepage.description=Container resource monitoring
       - homepage.icon=cadvisor.png
       - homepage.href=http://home-ubuntu:8081
+
+  jaeger:
+    image: jaegertracing/jaeger:latest
+    container_name: jaeger
+    networks:
+      - monitoring
+    restart: always
+    environment:
+      - OTEL_ENABLED=true
+    volumes:
+      - "./jaeger/jaeger-ui.json:/etc/jaeger/jaeger-ui.json"
+      - "./jaeger/config.yaml:/etc/jaeger/config.yaml"
+    command: ["--config", "/etc/jaeger/config.yaml"]
+    ports:
+      - "0.0.0.0:16686:16686"
+      - "0.0.0.0:8888:8888"
+      - "0.0.0.0:8889:8889"
+      - "0.0.0.0:4317:4317" # OTLP gRPC
+      - "0.0.0.0:4318:4318" # OTLP HTTP
+    labels:
+      - homepage.group=Monitoring
+      - homepage.name=Jaeger
+      - homepage.description=Distributed tracing system
+      - homepage.icon=jaeger.png
+      - homepage.href=http://home-ubuntu:16686
