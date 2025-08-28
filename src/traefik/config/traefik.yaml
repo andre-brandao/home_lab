@@ -22,6 +22,8 @@ entryPoints:
   # address: ":10000"
   # apis:
   # address: ":33073"
+  metrics:
+    address: ":8082"
 serversTransport:
   insecureSkipVerify: true
 providers:
@@ -49,3 +51,14 @@ log:
   filePath: "/var/log/traefik/traefik.log"
 accessLog:
   filePath: "/var/log/traefik/access.log"
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addServicesLabels: true
+    addEntryPointsLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0

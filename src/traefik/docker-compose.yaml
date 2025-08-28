@@ -5,6 +5,8 @@
 networks:
   proxy:
     external: true
+  monitoring:
+    external: true
 
 services:
   traefik:
@@ -21,6 +23,7 @@ services:
       - CF_DNS_API_TOKEN=${CF_TOKEN}
     networks:
       - proxy
+      - monitoring
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
@@ -33,7 +36,8 @@ services:
       - "80:80/tcp"
       - "443:443/tcp"
       - "443:443/udp"
-      - "8080:8080" # Add this line to expose the dashboard port
+      - "8080:8080" # Dashboard port
+      - "8082:8082" # Metrics port
     labels:
       - homepage.group=Deployment
       - homepage.name=Traefik
