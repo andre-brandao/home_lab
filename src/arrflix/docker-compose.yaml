@@ -48,9 +48,12 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
+      - 8000:8000/tcp # gluetun ?
       - 5656:5656 # port for qbittorrent
       - 6881:6881
       - 6881:6881/udp # port for qbit port forward if your VPN supports this
+    networks:
+      - arrflix
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
       # - VPN_TYPE=wireguard
@@ -64,7 +67,7 @@ services:
       - homepage.icon=gluetun.png
       - homepage.description=VPN service for Arrflix
       - homepage.widget.type=gluetun
-      - homepage.widget.url=http://gluetun:8080
+      - homepage.widget.url=http://gluetun:8000
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -73,7 +76,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - WEBUI_PORT=5656
-      # - TORRENTING_PORT=6881
+      - TORRENTING_PORT=6881
     volumes:
       - type: volume
         source: configuration
@@ -99,7 +102,7 @@ services:
       - homepage.href=http://home-ubuntu:5656
       - homepage.description=Torrent client
       - homepage.widget.type=qbittorrent
-      - homepage.widget.url=http://qbittorrent:5656
+      - homepage.widget.url=http://gluetun:5656
       - homepage.widget.username=admin
       - homepage.widget.password=${HTTP_PASSWORD}
       - homepage.widget.enableLeechProgress=true
