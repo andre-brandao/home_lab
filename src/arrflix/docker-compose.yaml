@@ -142,7 +142,7 @@ services:
       - homepage.group=Arr
       - homepage.name=prowlarr
       - homepage.icon=prowlarr.png
-      - homepage.href=http://${TAILNET}:9696
+      - homepage.href=https://${TAILNET}/prowlarr
       - homepage.description=Indexer
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696
@@ -197,7 +197,7 @@ services:
       - homepage.group=Media
       - homepage.name=Sonarr
       - homepage.icon=sonarr.png
-      - homepage.href=http://${TAILNET}:8989
+      - homepage.href=https://${TAILNET}/sonarr
       - homepage.description=TV Series Management
       - homepage.widget.type=sonarr
       - homepage.widget.url=http://sonarr:8989
@@ -257,7 +257,7 @@ services:
       - homepage.group=Media
       - homepage.name=Radarr
       - homepage.icon=radarr.png
-      - homepage.href=http://${TAILNET}:7878
+      - homepage.href=https://${TAILNET}/radarr
       - homepage.description=Movie Management
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878
@@ -315,7 +315,7 @@ services:
       - homepage.group=Media
       - homepage.name=bazarr
       - homepage.icon=bazarr.png
-      - homepage.href=https://${TAILNET}/6767
+      - homepage.href=https://${TAILNET}/bazarr
       - homepage.description=Subtitle Management
       - homepage.widget.type=bazarr
       - homepage.widget.url=http://bazarr:6767
