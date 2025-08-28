@@ -12,6 +12,7 @@ services:
     networks:
       - arrflix
       - proxy
+      - monitoring
     volumes:
       - /home/deds/homepage/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
