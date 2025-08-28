@@ -46,6 +46,10 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
+    ports:
+      - 5656:5656 # port for qbittorrent
+      - 6881:6881
+      - 6881:6881/udp # port for qbit port forward if your VPN supports this
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=wireguard
@@ -76,10 +80,10 @@ services:
           subpath: qbittorrent
       - downloads_complete:/data/completed
       - downloads_incomplete:/data/incomplete
-    ports:
-      - 5656:5656
-      - 6881:6881
-      - 6881:6881/udp
+    # ports:
+    #   - 5656:5656
+    #   - 6881:6881
+    #   - 6881:6881/udp
     restart: unless-stopped
     network_mode: "service:gluetun"
     # networks:
