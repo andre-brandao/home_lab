@@ -109,7 +109,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
-      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`qbittorrent.${TAILNET}`)
+      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && Path(`/qbittorrent`)
       - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
       # - traefik.http.routers.qbittorrent.entrypoints=https
       # - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.adob.dev`)
@@ -200,7 +200,7 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.sonarr-tailscale.entrypoints=tailscale
-      - traefik.http.routers.sonarr-tailscale.rule=Host(`sonarr.${TAILNET}`)
+      - traefik.http.routers.sonarr-tailscale.rule=Host(`${TAILNET}`) && Path(`/sonarr`)
       - traefik.http.routers.sonarr-tailscale.tls.certresolver=vpnresolver
       # - traefik.http.routers.sonarr-tailscale.tls=true
       # - traefik.http.routers.sonarr-tailscale.tls.domains[0].main=${TAILNET}
