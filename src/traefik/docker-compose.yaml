@@ -21,6 +21,7 @@ services:
       # - TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
       - CF_API_EMAIL=${CF_EMAIL}
       - CF_DNS_API_TOKEN=${CF_TOKEN}
+    # network_mode: host
     networks:
       - proxy
       - monitoring
@@ -32,6 +33,10 @@ services:
       - /home/deds/traefik/config/acme.json:/acme.json
       - /home/deds/traefik/config/config.yaml:/config.yaml:ro
       - /home/deds/traefik/logs:/var/log/traefik
+      # ----
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+      - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.crt:/certs/home-ubuntu.fable-company.ts.net.crt
+      - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.key:/certs/home-ubuntu.fable-company.ts.net.key
     ports:
       - "80:80/tcp"
       - "443:443/tcp"

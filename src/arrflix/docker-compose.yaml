@@ -108,13 +108,9 @@ services:
       - homepage.widget.enableLeechProgress=true
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.sonarr-tailscale.entrypoints=tailscale
-      - traefik.http.routers.sonarr-tailscale.rule=Host(`sonarr.${TAILNET}`)
-      - traefik.http.routers.sonarr-tailscale.tls=true
-      - traefik.http.routers.sonarr-tailscale.tls.certresolver=vpnresolver
-      - traefik.http.routers.sonarr-tailscale.tls.domains[0].main=${TAILNET}
-      - traefik.http.routers.sonarr-tailscale.service=sonarr
-
+      - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
+      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`qbittorrent.${TAILNET}`)
+      - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
       # - traefik.http.routers.qbittorrent.entrypoints=https
       # - traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.adob.dev`)
       # - traefik.http.middlewares.qbittorrent-https-redirect.redirectscheme.scheme=https
@@ -203,15 +199,23 @@ services:
       - homepage.widget.enableQueue=true
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.sonarr.entrypoints=http
-      - traefik.http.routers.sonarr.rule=Host(`sonarr.adob.dev`)
-      - traefik.http.middlewares.sonarr-https-redirect.redirectscheme.scheme=https
-      - traefik.http.routers.sonarr.middlewares=sonarr-https-redirect
-      - traefik.http.routers.sonarr-secure.entrypoints=https
-      - traefik.http.routers.sonarr-secure.rule=Host(`sonarr.adob.dev`)
-      - traefik.http.routers.sonarr-secure.tls=true
-      - traefik.http.routers.sonarr-secure.tls.certresolver=cloudflare
-      - traefik.http.routers.sonarr-secure.service=sonarr
+      - traefik.http.routers.sonarr-tailscale.entrypoints=tailscale
+      - traefik.http.routers.sonarr-tailscale.rule=Host(`sonarr.${TAILNET}`)
+      - traefik.http.routers.sonarr-tailscale.tls.certresolver=vpnresolver
+      # - traefik.http.routers.sonarr-tailscale.tls=true
+      # - traefik.http.routers.sonarr-tailscale.tls.domains[0].main=${TAILNET}
+      # - traefik.http.routers.sonarr-tailscale.service=sonarr
+      # - traefik.enable=true
+      # - traefik.docker.network=proxy
+      # - traefik.http.routers.sonarr.entrypoints=http
+      # - traefik.http.routers.sonarr.rule=Host(`sonarr.adob.dev`)
+      # - traefik.http.middlewares.sonarr-https-redirect.redirectscheme.scheme=https
+      # - traefik.http.routers.sonarr.middlewares=sonarr-https-redirect
+      # - traefik.http.routers.sonarr-secure.entrypoints=https
+      # - traefik.http.routers.sonarr-secure.rule=Host(`sonarr.adob.dev`)
+      # - traefik.http.routers.sonarr-secure.tls=true
+      # - traefik.http.routers.sonarr-secure.tls.certresolver=cloudflare
+      # - traefik.http.routers.sonarr-secure.service=sonarr
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
 
   radarr:
