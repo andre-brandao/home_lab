@@ -1,0 +1,5 @@
+include:
+  - ./traefik/docker-compose.yaml
+  - ./arrflix/docker-compose.yaml
+  - ./drive/docker-compose.yaml
+  - ./homepage/docker-compose.yaml

@@ -1,0 +1,32 @@
+---
+volumes:
+  drive:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/drive
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: syncthing #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/deds/syncthing/config:/config
+      - drive:/data
+    ports:
+      - 8384:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    restart: unless-stopped
+    labels:
+      - homepage.group=Files
+      - homepage.title=Syncthing
+      - homepage.description=Syncthing is a continuous file synchronization program.
+      - homepage.icon=syncthing.png
+      - homepage.url=http://localhost:8384

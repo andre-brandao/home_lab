@@ -1,0 +1,68 @@
+volumes:
+  grafana-storage:
+  prometheus-storage:
+
+networks:
+  monitoring:
+    external: true
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    # volumes:
+    #   - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-storage:/prometheus
+    networks:
+      - monitoring
+    restart: unless-stopped
+    labels:
+      - homepage.group=Monitoring
+      - homepage.name=Prometheus
+      - homepage.description=Time series database
+      - homepage.icon=prometheus.png
+      - homepage.href=http://home-ubuntu:9090
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${USERNAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${PASSWORD}
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - monitoring
+    restart: unless-stopped
+    labels:
+      - homepage.group=Monitoring
+      - homepage.name=Grafana
+      - homepage.description=Monitoring and visualization platform
+      - homepage.icon=grafana.png
+      - homepage.href=http://home-ubuntu:3001
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    ports:
+      - "8081:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Only needed on Docker Desktop for Mac
+    networks:
+      - monitoring
+    restart: unless-stopped
+    labels:
+      - homepage.group=Monitoring
+      - homepage.name=Cadvisor
+      - homepage.description=Container resource monitoring
+      - homepage.icon=cadvisor.png
+      - homepage.href=http://home-ubuntu:8081
