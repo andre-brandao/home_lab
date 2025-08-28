@@ -400,4 +400,4 @@ services:
       - traefik.http.routers.jellyseerr-secure.rule=Host(`flixrequest.adob.dev`)
       - traefik.http.routers.jellyseerr-secure.tls=true
       - traefik.http.routers.jellyseerr-secure.tls.certresolver=cloudflare
-      - traefik.http.routers.jellyseerr-secure.service=jellyseerr
+      # - traefik.http.routers.jellyseerr-secure.service=jellyseerr
