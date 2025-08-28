@@ -99,7 +99,7 @@ services:
       - homepage.group=Arr
       - homepage.name=qBittorrent
       - homepage.icon=qbittorrent.png
-      - homepage.href=http://home-ubuntu:5656
+      - homepage.href=http://${TAILNET}:5656
       - homepage.description=Torrent client
       - homepage.widget.type=qbittorrent
       - homepage.widget.url=http://gluetun:5656
@@ -138,7 +138,7 @@ services:
       - homepage.group=Arr
       - homepage.name=prowlarr
       - homepage.icon=prowlarr.png
-      - homepage.href=http://home-ubuntu:9696
+      - homepage.href=http://${TAILNET}:9696
       - homepage.description=Indexer
       - homepage.widget.type=prowlarr
       - homepage.widget.url=http://prowlarr:9696
@@ -189,7 +189,7 @@ services:
       - homepage.group=Media
       - homepage.name=Sonarr
       - homepage.icon=sonarr.png
-      - homepage.href=http://home-ubuntu:8989
+      - homepage.href=http://${TAILNET}:8989
       - homepage.description=TV Series Management
       - homepage.widget.type=sonarr
       - homepage.widget.url=http://sonarr:8989
@@ -245,7 +245,7 @@ services:
       - homepage.group=Media
       - homepage.name=Radarr
       - homepage.icon=radarr.png
-      - homepage.href=https://${TAILNET}/bazarr
+      - homepage.href=http://${TAILNET}:7878
       - homepage.description=Movie Management
       - homepage.widget.type=radarr
       - homepage.widget.url=http://radarr:7878
@@ -300,7 +300,7 @@ services:
       - homepage.group=Media
       - homepage.name=bazarr
       - homepage.icon=bazarr.png
-      - homepage.href=https://${TAILNET}/bazarr
+      - homepage.href=https://${TAILNET}/6767
       - homepage.description=Subtitle Management
       - homepage.widget.type=bazarr
       - homepage.widget.url=http://bazarr:6767
