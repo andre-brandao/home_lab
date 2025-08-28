@@ -50,6 +50,8 @@ services:
       - homepage.description=Reverse proxy and load balancer
       - homepage.icon=traefik.png
       - homepage.href=http://home-ubuntu:8080
+      - homepage.widget.type=traefik
+      - homepage.widget.url=http://traefik:8080
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
       - "traefik.http.routers.traefik.rule=Host(`traefik.adob.dev`)"

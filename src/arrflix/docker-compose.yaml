@@ -69,6 +69,15 @@ services:
       - homepage.description=VPN service for Arrflix
       - homepage.widget.type=gluetun
       - homepage.widget.url=http://gluetun:8000
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
+      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && Path(`/qbittorrent`)
+      - traefik.http.routers.qbittorrent-tailscale.middlewares=qbittorrent-stripprefix
+      - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.prefixes=/qbittorrent
+      - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
+
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -107,12 +116,6 @@ services:
       - homepage.widget.username=admin
       - homepage.widget.password=${HTTP_PASSWORD}
       - homepage.widget.enableLeechProgress=true
-      - traefik.enable=true
-      - traefik.docker.network=proxy
-      - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
-      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && Path(`/qbittorrent`)
-      - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
-      - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
