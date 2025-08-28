@@ -82,9 +82,9 @@ services:
       - 6881:6881/udp
     restart: unless-stopped
     network_mode: "service:gluetun"
-    networks:
-      - arrflix
-      - proxy
+    # networks:
+    #   - arrflix
+    #   - proxy
     labels:
       - homepage.group=Arr
       - homepage.name=qBittorrent
