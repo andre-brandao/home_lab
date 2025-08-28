@@ -40,17 +40,24 @@ volumes:
       device: ${DATADIR}/Downloads/incomplete
 
 services:
-  # gluetun:
-  #   image: qmcgaw/gluetun
-  #   cap_add:
-  #     - NET_ADMIN
-  #   devices:
-  #     - /dev/net/tun:/dev/net/tun
-  #   environment:
-  #     - VPN_SERVICE_PROVIDER=protonvpn
-  #     - VPN_TYPE=wireguard
-  #     # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-  #     # - SERVER_COUNTRIES=Brazil
+  gluetun:
+    image: qmcgaw/gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - SERVER_COUNTRIES=Brazil
+    labels:
+      - homepage.group=Arr
+      - homepage.name=GlueTun
+      - homepage.icon=gluetun.png
+      - homepage.description=VPN service for Arrflix
+      - homepage.widget.type=gluetun
+      - homepage.widget.url=http://gluetun:8080
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -59,6 +66,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
       - WEBUI_PORT=5656
+      # - TORRENTING_PORT=6881
     volumes:
       - type: volume
         source: configuration
@@ -73,6 +81,7 @@ services:
       - 6881:6881
       - 6881:6881/udp
     restart: unless-stopped
+    network_mode: "service:gluetun"
     networks:
       - arrflix
       - proxy
