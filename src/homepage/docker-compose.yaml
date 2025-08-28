@@ -26,9 +26,9 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
-      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`)
-      - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.routers.homepage-tailscale.entrypoints=tailscale
+      - traefik.http.routers.homepage-tailscale.rule=Host(`${TAILNET}`)
+      - traefik.http.routers.homepage-tailscale.tls.certresolver=vpnresolver
   internet-speed:
     image: germannewsmaker/myspeed
     container_name: myspeed
