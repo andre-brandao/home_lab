@@ -120,7 +120,11 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - URL_BASE=/prowlarr
+      - PROWLARR__AUTH__APIKEY=${PROWLARR_KEY}
+      - PROWLARR__PORT=9696
+      - PROWLARR__SERVER__URLBASE=/prowlarr
+      - PROWLARR__LOG__LEVEL=info
+      - PROWLARR__AUTH__AUTHENTICATION_REQUIRED=false
     volumes:
       - type: volume
         source: configuration
@@ -181,7 +185,11 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - URL_BASE=/sonarr
+      - SONARR__AUTH__APIKEY=${SONARR_KEY}
+      - SONARR__PORT=8989
+      - SONARR__SERVER__URLBASE=/sonarr
+      - SONARR__LOG__LEVEL=info
+      - SONARR__AUTH__AUTHENTICATION_REQUIRED=false
     networks:
       - arrflix
       - proxy
@@ -238,7 +246,11 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - URL_BASE=/radarr
+      - RADARR__AUTH__APIKEY=${RADARR_KEY}
+      - RADARR__PORT=7878
+      - RADARR__SERVER__URLBASE=/radarr
+      - RADARR__LOG__LEVEL=info
+      - RADARR__AUTH__AUTHENTICATION_REQUIRED=false
     networks:
       - arrflix
     labels:
@@ -285,7 +297,10 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - URL_BASE=/bazarr
+      - BAZARR__AUTH__APIKEY=${BAZARR_KEY}
+      - BAZARR__PORT=6767
+      - BAZARR__SERVER__URLBASE=/bazarr
+      - BAZARR__LOG__LEVEL=info
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - type: volume
