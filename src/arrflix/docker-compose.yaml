@@ -197,6 +197,8 @@ services:
       - traefik.docker.network=proxy
       - traefik.http.routers.sonarr-tailscale.entrypoints=tailscale
       - traefik.http.routers.sonarr-tailscale.rule=Host(`${TAILNET}`) && Path(`/sonarr`)
+      - traefik.http.routers.sonarr-tailscale.middlewares=sonarr-stripprefix
+      - traefik.http.middlewares.sonarr-stripprefix.stripprefix.prefixes=/sonarr
       - traefik.http.routers.sonarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
 
