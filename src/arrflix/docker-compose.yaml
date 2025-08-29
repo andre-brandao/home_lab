@@ -88,6 +88,8 @@ services:
       - TZ=${TZ}
       - WEBUI_PORT=5656
       - TORRENTING_PORT=6881
+    # mem_limit: 4g
+
     volumes:
       - type: volume
         source: configuration
@@ -97,15 +99,8 @@ services:
           subpath: qbittorrent
       - downloads_complete:/data/completed
       - downloads_incomplete:/data/incomplete
-    # ports:
-    #   - 5656:5656
-    #   - 6881:6881
-    #   - 6881:6881/udp
     restart: unless-stopped
     network_mode: "service:gluetun"
-    # networks:
-    #   - arrflix
-    #   - proxy
     labels:
       - homepage.group=Arr
       - homepage.name=qBittorrent
@@ -209,8 +204,6 @@ services:
     container_name: radarr
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      # - ${USERDIR}/docker/radarr:/config
-      # - ${USERDIR}/docker/certs:/certs
       - type: volume
         source: configuration
         target: /config
@@ -285,7 +278,7 @@ services:
       - homepage.group=Media
       - homepage.name=bazarr
       - homepage.icon=bazarr.png
-      - homepage.href=https://${TAILNET}:6767
+      - homepage.href=http://${TAILNET}:6767
       - homepage.description=Subtitle Management
       - homepage.widget.type=bazarr
       - homepage.widget.url=http://bazarr:6767

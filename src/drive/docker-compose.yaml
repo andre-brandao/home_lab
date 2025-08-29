@@ -29,4 +29,4 @@ services:
       - homepage.title=Syncthing
       - homepage.description=Syncthing is a continuous file synchronization program.
       - homepage.icon=syncthing.png
-      - homepage.url=http://localhost:8384
+      - homepage.url=http://home-ubuntu:8384
