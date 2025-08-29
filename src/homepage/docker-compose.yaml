@@ -19,6 +19,7 @@ services:
       - /home/deds/homepage/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/deds/homepage/logs:/app/logs
+      - /mnt/arr:/mnt/arr
     environment:
       # PUID: ${PUID:-1000}
       # PGID: ${PGID:-1000}

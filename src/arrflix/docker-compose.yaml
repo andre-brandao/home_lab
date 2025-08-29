@@ -195,7 +195,7 @@ services:
       - homepage.widget.type=sonarr
       - homepage.widget.url=http://sonarr:8989
       - homepage.widget.key=${SONARR_KEY}
-      - homepage.widget.enableQueue=true
+      # - homepage.widget.enableQueue=true
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.sonarr-tailscale.entrypoints=tailscale
