@@ -55,6 +55,7 @@ services:
       - 6881:6881/udp # port for qbit port forward if your VPN supports this
     networks:
       - arrflix
+      - proxy
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
       # - VPN_TYPE=wireguard
@@ -232,6 +233,7 @@ services:
       - RADARR__AUTH__AUTHENTICATION_REQUIRED=false
     networks:
       - arrflix
+      - proxy
     labels:
       - homepage.group=Media
       - homepage.name=Radarr
