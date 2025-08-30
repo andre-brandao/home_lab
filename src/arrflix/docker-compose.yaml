@@ -49,9 +49,9 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      - 8000:8000/tcp # gluetun ?
-      - 5656:5656 # port for qbittorrent
-      - 6881:6881
+      - 8000:8000/tcp # gluetun api
+      - 5656:5656 # port for qbit web ui
+      - 6881:6881 # port for qbit port forward if your VPN supports this
       - 6881:6881/udp # port for qbit port forward if your VPN supports this
     networks:
       - arrflix
@@ -70,14 +70,20 @@ services:
       - homepage.description=VPN service for Arrflix
       - homepage.widget.type=gluetun
       - homepage.widget.url=http://gluetun:8000
+
       - traefik.enable=true
       - traefik.docker.network=proxy
+
       - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
-      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/qbittorrent`)
-      - traefik.http.routers.qbittorrent-tailscale.middlewares=qbittorrent-stripprefix
-      - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.prefixes=/qbittorrent
+      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/qbit`)
       - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
+
       - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
+
+      - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.prefixes=/qbit
+      - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.forceSlash=true
+
+      - traefik.http.routers.qbittorrent.middlewares=qbittorrent-stripprefix
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
