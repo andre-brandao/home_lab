@@ -1,29 +1,51 @@
+networks:
+  proxy:
+    external: true
+
 services:
-  ts-vaultwarden:
-    image: tailscale/tailscale:latest
-    container_name: ts-vaultwarden
-    environment:
-      - TS_HOSTNAME=vaultwarden
-      - TS_AUTHKEY=tskey-auth-kCNNdU...-hW8rd...8ZDL
-      - TS_STATE_DIR=/var/lib/tailscale
-    volumes:
-      - ./tailscale/state:/var/lib/tailscale
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
-      - sys_module
-    restart: unless-stopped
+  # ts-vaultwarden:
+  #   image: tailscale/tailscale:latest
+  #   container_name: ts-vaultwarden
+  #   environment:
+  #     - TS_HOSTNAME=vaultwarden
+  #     - TS_AUTHKEY=tskey-auth-kCNNdU...-hW8rd...8ZDL
+  #     - TS_STATE_DIR=/var/lib/tailscale
+  #   volumes:
+  #     - ./tailscale/state:/var/lib/tailscale
+  #   devices:
+  #     - /dev/net/tun:/dev/net/tun
+  #   cap_add:
+  #     - net_admin
+  #     - sys_module
+  #   restart: unless-stopped
   vaultwarden:
     image: vaultwarden/server:latest
     container_name: vaultwarden
-    network_mode: service:ts-vaultwarden
+    # network_mode: service:ts-vaultwarden
+    networks:
+      - proxy
+    expose:
+      - 80
     # ports:
-    #       - 127.0.0.1:8000:80
+    #   - 1234:80
     environment:
-      DOMAIN: "https://vw.domain.tld"
-    depends_on:
-      - ts-vaultwarden
+      DOMAIN: "https://${TAILNET}"
+    # depends_on:
+    #   - ts-vaultwarden
     restart: unless-stopped
     volumes:
       - ./vw-data/:/data/
+    labels:
+      - homepage.group=Security
+      - homepage.name=Vaultwarden
+      - homepage.icon=vaultwarden.png
+      - homepage.description=Password manager
+      - homepage.href=https://${TAILNET}/vaultwarden/
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.vaultwarden-tailscale.entrypoints=tailscale
+      - traefik.http.routers.vaultwarden-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/vaultwarden`)
+      - traefik.http.routers.vaultwarden-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.middlewares.vaultwarden-stripprefix.stripprefix.prefixes=/vaultwarden
+      - traefik.http.middlewares.vaultwarden-stripprefix.stripprefix.forceSlash=true
+      - traefik.http.routers.vaultwarden-tailscale.middlewares=vaultwarden-stripprefix
