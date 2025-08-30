@@ -83,7 +83,7 @@ services:
       - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.prefixes=/qbit
       - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.forceSlash=true
 
-      - traefik.http.routers.qbittorrent.middlewares=qbittorrent-stripprefix
+      - traefik.http.routers.qbittorrent-tailscale.middlewares=qbittorrent-stripprefix
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
