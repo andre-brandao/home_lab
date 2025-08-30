@@ -70,19 +70,14 @@ services:
       - homepage.description=VPN service for Arrflix
       - homepage.widget.type=gluetun
       - homepage.widget.url=http://gluetun:8000
-
       - traefik.enable=true
       - traefik.docker.network=proxy
-
       - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
       - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/qbit`)
       - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
-
       - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
-
       - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.prefixes=/qbit
       - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.forceSlash=true
-
       - traefik.http.routers.qbittorrent-tailscale.middlewares=qbittorrent-stripprefix
 
   qbittorrent:
@@ -111,7 +106,7 @@ services:
       - homepage.group=Arr
       - homepage.name=qBittorrent
       - homepage.icon=qbittorrent.png
-      - homepage.href=http://${TAILNET}:5656
+      - homepage.href=https://${TAILNET}/qbit
       - homepage.description=Torrent client
       - homepage.widget.type=qbittorrent
       - homepage.widget.url=http://gluetun:5656
