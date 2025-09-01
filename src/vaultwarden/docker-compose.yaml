@@ -43,7 +43,7 @@ services:
       - homepage.href=https://${TAILNET}/vaultwarden/
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.vaultwarden-tailscale.entrypoints=tailscale
+      - traefik.http.routers.vaultwarden-tailscale.entrypoints=web-secure
       - traefik.http.routers.vaultwarden-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/vaultwarden`)
       - traefik.http.routers.vaultwarden-tailscale.tls.certresolver=vpnresolver
       - traefik.http.middlewares.vaultwarden-stripprefix.stripprefix.prefixes=/vaultwarden

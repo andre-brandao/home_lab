@@ -1,6 +1,8 @@
 networks:
   proxy:
     external: true
+  monitoring:
+    external: true
 
 services:
   tinyauth:
@@ -25,6 +27,14 @@ services:
 
       # - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       # - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+
+      - GENERIC_CLIENT_ID=${POCKETID_CLIENT_ID}
+      - GENERIC_CLIENT_SECRET=${POCKETID_CLIENT_SECRET}
+      - GENERIC_AUTH_URL=https://pid.adob.dev/authorize
+      - GENERIC_TOKEN_URL=https://pid.adob.dev/api/oidc/token
+      - GENERIC_USER_URL=https://pid.adob.dev/api/oidc/userinfo
+      - GENERIC_SCOPES=openid email profile groups
+      - GENERIC_NAME=Pocket ID
       # # --- LDAP ---
       - LDAP_ADDRESS=ldap://lldap:3890
       - LDAP_BIND_DN=uid=admin,ou=people,dc=adob,dc=dev
@@ -41,12 +51,12 @@ services:
 
       traefik.enable: true
       traefik.docker.network: proxy
-      traefik.http.routers.tinyauth.entrypoints: http
+      traefik.http.routers.tinyauth.entrypoints: web-external
       traefik.http.routers.tinyauth.rule: Host(`auth.adob.dev`)
       traefik.http.middlewares.tinyauth.forwardauth.address: http://tinyauth:3000/api/auth/traefik
       traefik.http.middlewares.tinyauth-https-redirect.redirectscheme.scheme: https
       traefik.http.routers.tinyauth.middlewares: tinyauth-https-redirect
-      traefik.http.routers.tinyauth-secure.entrypoints: https
+      traefik.http.routers.tinyauth-secure.entrypoints: web-secure-external
       traefik.http.routers.tinyauth-secure.rule: Host(`auth.adob.dev`)
       traefik.http.routers.tinyauth-secure.tls: true
       traefik.http.routers.tinyauth-secure.tls.certresolver: cloudflare
@@ -97,3 +107,57 @@ services:
       homepage.description: LDAP Authentication
       homepage.icon: lldap.png
       homepage.href: http://home-ubuntu:17170
+
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v1
+    container_name: pocket-id
+    restart: unless-stopped
+    # env_file: .env
+    environment:
+      # See the documentation for more information: https://pocket-id.org/docs/configuration/environment-variables
+      - APP_URL=https://pid.adob.dev
+      - APP_NAME=Deds ID
+      # - ACCENT_COLOR=default
+      - TRUST_PROXY=true
+      # - MAXMIND_LICENSE_KEY=  # Get one here https://www.maxmind.com/en/geolite2/signup
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - LDAP_ENABLED=true
+      - LDAP_URL=ldap://lldap:3890
+      - LDAP_BIND_DN=uid=admin,ou=people,dc=adob,dc=dev
+      - LDAP_BIND_PASSWORD=${LLDAP_USER_PASS}
+      - LDAP_BASE=dc=adob,dc=dev
+      - LDAP_USER_SEARCH_FILTER=(uid=%s)
+      - OTEL_METRICS_EXPORTER=prometheus
+      - OTEL_EXPORTER_PROMETHEUS_HOST=prometheus
+      - OTEL_EXPORTER_PROMETHEUS_PORT=9464
+    ports:
+      - 1411:1411
+    networks:
+      - proxy
+      - monitoring
+    volumes:
+      - "./pid_data:/app/data"
+    # Optional healthcheck
+    healthcheck:
+      test: ["CMD", "/app/pocket-id", "healthcheck"]
+      interval: 1m30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+    labels:
+      homepage.group: Security
+      homepage.name: Pocket ID
+      homepage.description: Pocket ID Authentication
+      homepage.icon: pocket-id.png
+      homepage.href: https://pid.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.pocket-id.entrypoints: web-external
+      traefik.http.routers.pocket-id.rule: Host(`pid.adob.dev`)
+      traefik.http.middlewares.pocket-id-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.pocket-id.middlewares: pocket-id-https-redirect
+      traefik.http.routers.pocket-id-secure.entrypoints: web-secure-external
+      traefik.http.routers.pocket-id-secure.rule: Host(`pid.adob.dev`)
+      traefik.http.routers.pocket-id-secure.tls: true
+      traefik.http.routers.pocket-id-secure.tls.certresolver: cloudflare

@@ -65,7 +65,7 @@ services:
       - homepage.widget.password=${PASSWORD}
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.grafana-tailscale.entrypoints=tailscale
+      - traefik.http.routers.grafana-tailscale.entrypoints=web-secure
       - traefik.http.routers.grafana-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/grafana`)
       - traefik.http.routers.grafana-tailscale.tls.certresolver=vpnresolver
   cadvisor:
@@ -120,7 +120,7 @@ services:
       - homepage.href=https://${TAILNET}/jaeger/
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.jaeger-tailscale.entrypoints=tailscale
+      - traefik.http.routers.jaeger-tailscale.entrypoints=web-secure
       - traefik.http.routers.jaeger-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/jaeger`)
       - traefik.http.routers.jaeger-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.jaeger.loadbalancer.server.port=16686

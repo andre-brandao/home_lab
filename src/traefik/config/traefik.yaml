@@ -3,16 +3,30 @@ api:
   debug: true
   insecure: true
 entryPoints:
-  http:
+  web:
     address: ":80"
     http:
       #  middlewares: # uncomment if using CrowdSec
       #    - crowdsec-bouncer@file
       redirections:
         entrypoint:
-          to: https
+          to: web-secure
           scheme: https
-  https:
+  web-external:
+    address: ":81"
+    http:
+      #  middlewares: # uncomment if using CrowdSec
+      #    - crowdsec-bouncer@file
+      redirections:
+        entrypoint:
+          to: web-external-secure
+          scheme: https
+  web-secure:
+    address: ":443"
+    # http:
+    #  middlewares: # uncomment if using CrowdSec
+    #    - crowdsec-bouncer@file
+  web-secure-external:
     address: ":444"
     # http:
     #  middlewares: # uncomment if using CrowdSec
@@ -23,8 +37,8 @@ entryPoints:
   # address: ":33073"
   metrics:
     address: ":8082"
-  tailscale:
-    address: ":443"
+  # tailscale:
+  #   address: ":443"
 serversTransport:
   insecureSkipVerify: true
 providers:
