@@ -73,7 +73,7 @@ services:
       - homepage.widget.url=http://gluetun:8000
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.qbittorrent-tailscale.entrypoints=tailscale
+      - traefik.http.routers.qbittorrent-tailscale.entrypoints=web-secure
       - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/qbit`)
       - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
@@ -151,7 +151,7 @@ services:
       - homepage.widget.key=${PROWLARR_KEY}
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.prowlarr-tailscale.entrypoints=tailscale
+      - traefik.http.routers.prowlarr-tailscale.entrypoints=web-secure
       - traefik.http.routers.prowlarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/prowlarr`)
       - traefik.http.routers.prowlarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
@@ -196,7 +196,7 @@ services:
       # - homepage.widget.enableQueue=true
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.sonarr-tailscale.entrypoints=tailscale
+      - traefik.http.routers.sonarr-tailscale.entrypoints=web-secure
       - traefik.http.routers.sonarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/sonarr`)
       - traefik.http.routers.sonarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
@@ -241,7 +241,7 @@ services:
       - homepage.widget.enableQueue=true
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.radarr-tailscale.entrypoints=tailscale
+      - traefik.http.routers.radarr-tailscale.entrypoints=web-secure
       - traefik.http.routers.radarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/radarr`)
       - traefik.http.routers.radarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
@@ -287,7 +287,7 @@ services:
       - homepage.widget.key=${BAZARR_KEY}
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.bazarr-tailscale.entrypoints=tailscale
+      - traefik.http.routers.bazarr-tailscale.entrypoints=web-secure
       - traefik.http.routers.bazarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/bazarr`)
       - traefik.http.routers.bazarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.bazarr.loadbalancer.server.port=6767
@@ -332,11 +332,11 @@ services:
       - homepage.widget.enableBlocks=true
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.jellyfin.entrypoints=http
+      - traefik.http.routers.jellyfin.entrypoints=web-external
       - traefik.http.routers.jellyfin.rule=Host(`dedsflix.adob.dev`)
       - traefik.http.middlewares.jellyfin-https-redirect.redirectscheme.scheme=https
       - traefik.http.routers.jellyfin.middlewares=jellyfin-https-redirect
-      - traefik.http.routers.jellyfin-secure.entrypoints=https
+      - traefik.http.routers.jellyfin-secure.entrypoints=web-secure-external
       - traefik.http.routers.jellyfin-secure.rule=Host(`dedsflix.adob.dev`)
       - traefik.http.routers.jellyfin-secure.tls=true
       - traefik.http.routers.jellyfin-secure.tls.certresolver=cloudflare
@@ -382,11 +382,11 @@ services:
       - homepage.widget.key=${JELLYSEERR_KEY}
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.jellyseerr.entrypoints=http
+      - traefik.http.routers.jellyseerr.entrypoints=web-external
       - traefik.http.routers.jellyseerr.rule=Host(`flixrequest.adob.dev`)
       - traefik.http.middlewares.jellyseerr-https-redirect.redirectscheme.scheme=https
       - traefik.http.routers.jellyseerr.middlewares=jellyseerr-https-redirect
-      - traefik.http.routers.jellyseerr-secure.entrypoints=https
+      - traefik.http.routers.jellyseerr-secure.entrypoints=web-secure-external
       - traefik.http.routers.jellyseerr-secure.rule=Host(`flixrequest.adob.dev`)
       - traefik.http.routers.jellyseerr-secure.tls=true
       - traefik.http.routers.jellyseerr-secure.tls.certresolver=cloudflare
