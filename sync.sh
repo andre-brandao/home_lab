@@ -61,7 +61,7 @@ if [ $? -eq 0 ]; then
     if gum confirm "Restart docker compose on remote server?"; then
         echo
         gum style --foreground="#0099FF" "Restarting docker compose..."
-        ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${REMOTE_DIR} && docker compose down && docker compose up -d"
+        ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${REMOTE_DIR} && docker compose up -d --build --remove-orphans"
 
         if [ $? -eq 0 ]; then
             gum style --foreground="#00FF00" "Docker compose restarted successfully!"
