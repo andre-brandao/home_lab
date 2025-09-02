@@ -14,6 +14,7 @@ services:
     environment:
       # You can generate the SECRET environment variable using openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32 && echo
       - SECRET=${SECRET}
+      - COOKIE_SECURE=true
       - APP_URL=https://auth.adob.dev
       # You can generate the USER using docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v3 user create --interactive
       # - USERS=${USERS}
@@ -30,7 +31,7 @@ services:
 
       - GENERIC_CLIENT_ID=${POCKETID_CLIENT_ID}
       - GENERIC_CLIENT_SECRET=${POCKETID_CLIENT_SECRET}
-      - GENERIC_AUTH_URL=https://pid.adob.dev/api/oidc/authorize
+      - GENERIC_AUTH_URL=https://pid.adob.dev/authorize
       - GENERIC_TOKEN_URL=https://pid.adob.dev/api/oidc/token
       - GENERIC_USER_URL=https://pid.adob.dev/api/oidc/userinfo
       - GENERIC_SCOPES=openid email profile groups
@@ -60,7 +61,6 @@ services:
       traefik.http.routers.tinyauth-secure.rule: Host(`auth.adob.dev`)
       traefik.http.routers.tinyauth-secure.tls: true
       traefik.http.routers.tinyauth-secure.tls.certresolver: cloudflare
-
   lldap:
     image: lldap/lldap:stable
     container_name: lldap
