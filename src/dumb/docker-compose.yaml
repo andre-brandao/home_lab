@@ -1,0 +1,115 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  dumbpad:
+    image: dumbwareio/dumbpad:latest
+    container_name: dumbpad
+    restart: unless-stopped
+    # ports:
+    #   - 3000:3000
+    expose:
+      - 3000
+    networks:
+      - proxy
+    volumes:
+      # Where your notes will be stored
+      - ./pad_data:/app/data
+    environment:
+      # The title shown in the web interface
+      SITE_TITLE: DumbPad
+      # Optional PIN protection (leave empty to disable)
+      DUMBPAD_PIN: 1234
+      # The base URL for the application
+      BASE_URL: https://dumbpad.adob.dev
+    labels:
+      homepage.group: Dumbware
+      homepage.name: DumbPad
+      homepage.description: A simple note-taking application
+      homepage.icon: dumbpad.png
+      homepage.href: https://dumbpad.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.dumbpad.entrypoints: web-external
+      traefik.http.routers.dumbpad.rule: Host(`dumbpad.adob.dev`)
+      traefik.http.middlewares.dumbpad-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.dumbpad.middlewares: dumbpad-https-redirect
+      traefik.http.routers.dumbpad-secure.middlewares: tinyauth
+      traefik.http.routers.dumbpad-secure.entrypoints: web-secure-external
+      traefik.http.routers.dumbpad-secure.rule: Host(`dumbpad.adob.dev`)
+      traefik.http.routers.dumbpad-secure.tls: true
+      traefik.http.routers.dumbpad-secure.tls.certresolver: cloudflare
+
+  dumbbudget:
+    image: dumbwareio/dumbbudget:latest
+    container_name: dumbbudget
+    expose:
+      - 3000
+    networks:
+      - proxy
+    environment:
+      - DUMBBUDGET_PIN=12345
+      - CURRENCY=BRL
+      - BASE_URL=https://dumbbudget.adob.dev
+      - INSTANCE_NAME='Deds Personal Budget'
+    volumes:
+      - ./budget_data:/app/data
+    restart: unless-stopped
+    labels:
+      homepage.group: Dumbware
+      homepage.name: DumbBudget
+      homepage.description: A simple budgeting application
+      homepage.icon: dumbudget.png
+      homepage.href: https://dumbbudget.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.dumbbudget.entrypoints: web-external
+      traefik.http.routers.dumbbudget.rule: Host(`dumbbudget.adob.dev`)
+      traefik.http.middlewares.dumbbudget-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.dumbbudget.middlewares: dumbbudget-https-redirect
+      traefik.http.routers.dumbbudget-secure.middlewares: tinyauth
+      traefik.http.routers.dumbbudget-secure.entrypoints: web-secure-external
+      traefik.http.routers.dumbbudget-secure.rule: Host(`dumbbudget.adob.dev`)
+      traefik.http.routers.dumbbudget-secure.tls: true
+      traefik.http.routers.dumbbudget-secure.tls.certresolver: cloudflare
+
+  dumbassets:
+    container_name: dumbassets
+    image: dumbwareio/dumbassets:latest
+    # ports:
+    #   - 3000:3000
+    expose:
+      - 3000
+    networks:
+      - proxy
+    volumes:
+      - ./assets_data:/app/data
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-UTC}
+      PORT: 3000
+      NODE_ENV: production
+      # DEBUG: ${DUMBASSETS_DEBUG:-true}
+      SITE_TITLE: Deds Assets
+      BASE_URL: http://localhost:3000
+      DUMBASSETS_PIN: 1234
+      ALLOWED_ORIGINS: "*"
+      # APPRISE_URL: ${DUMBASSETS_APPRISE_URL:-}
+    labels:
+      homepage.group: Dumbware
+      homepage.name: DumbAssets
+      homepage.description: A simple asset management application
+      homepage.icon: dumbassets.png
+      homepage.href: https://dumbassets.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.dumbassets.entrypoints: web-external
+      traefik.http.routers.dumbassets.rule: Host(`dumbassets.adob.dev`)
+      traefik.http.middlewares.dumbassets-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.dumbassets.middlewares: dumbassets-https-redirect
+      traefik.http.routers.dumbassets-secure.middlewares: tinyauth
+      traefik.http.routers.dumbassets-secure.entrypoints: web-secure-external
+      traefik.http.routers.dumbassets-secure.rule: Host(`dumbassets.adob.dev`)
+      traefik.http.routers.dumbassets-secure.tls: true
+      traefik.http.routers.dumbassets-secure.tls.certresolver: cloudflare
