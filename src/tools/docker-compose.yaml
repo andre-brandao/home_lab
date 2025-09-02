@@ -1,0 +1,60 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  it-tools:
+    image: corentinth/it-tools:latest
+    container_name: it-tools
+    # ports:
+    #   - 8080:80
+    expose:
+      - 80
+    networks:
+      - proxy
+    restart: unless-stopped
+    labels:
+      homepage.group: Development
+      homepage.name: IT Tools
+      homepage.icon: ittools.png
+      homepage.description: A collection of useful tools for developers.
+      homepage.href: https://it-tools.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.it-tools.entrypoints: web-external
+      traefik.http.routers.it-tools.rule: Host(`it-tools.adob.dev`)
+      traefik.http.middlewares.it-tools-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.it-tools.middlewares: it-tools-https-redirect
+      traefik.http.routers.it-tools-secure.entrypoints: web-secure-external
+      traefik.http.routers.it-tools-secure.rule: Host(`it-tools.adob.dev`)
+      traefik.http.routers.it-tools-secure.tls: true
+      traefik.http.routers.it-tools-secure.tls.certresolver: cloudflare
+      traefik.http.routers.it-tools-secure.middlewares: tinyauth
+
+  omni-tools:
+    image: iib0011/omni-tools:latest
+    container_name: omni-tools
+    # ports:
+    #   - "8080:80"
+    restart: unless-stopped
+    expose:
+      - 80
+    networks:
+      - proxy
+    labels:
+      homepage.group: Development
+      homepage.name: Omni Tools
+      homepage.icon: omnitools.png
+      homepage.description: A collection of useful tools for developers.
+      homepage.href: https://omni-tools.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.omni-tools.entrypoints: web-external
+      traefik.http.routers.omni-tools.rule: Host(`omni-tools.adob.dev`)
+      traefik.http.middlewares.omni-tools-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.omni-tools.middlewares: omni-tools-https-redirect
+      traefik.http.routers.omni-tools-secure.entrypoints: web-secure-external
+      traefik.http.routers.omni-tools-secure.rule: Host(`omni-tools.adob.dev`)
+      traefik.http.routers.omni-tools-secure.tls: true
+      traefik.http.routers.omni-tools-secure.tls.certresolver: cloudflare
+      traefik.http.routers.omni-tools-secure.middlewares: tinyauth

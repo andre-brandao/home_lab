@@ -30,7 +30,7 @@ services:
 
       - GENERIC_CLIENT_ID=${POCKETID_CLIENT_ID}
       - GENERIC_CLIENT_SECRET=${POCKETID_CLIENT_SECRET}
-      - GENERIC_AUTH_URL=https://pid.adob.dev/authorize
+      - GENERIC_AUTH_URL=https://pid.adob.dev/api/oidc/authorize
       - GENERIC_TOKEN_URL=https://pid.adob.dev/api/oidc/token
       - GENERIC_USER_URL=https://pid.adob.dev/api/oidc/userinfo
       - GENERIC_SCOPES=openid email profile groups
