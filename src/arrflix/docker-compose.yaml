@@ -308,6 +308,8 @@ services:
           subpath: jellyfin
       - media_shows:/data/tvshows
       - media_movies:/data/movies
+      - ./assets/img/banner-dark.png:/usr/share/jellyfin/web/assets/img/banner-dark.png
+      - ./assets/img/banner-light.png:/usr/share/jellyfin/web/assets/img/banner-light.png
       # ./assets/img/:/usr/share/jellyfin/web/assets/img/
       # ./assets/splash/:/usr/share/jellyfin/web/assets/spash/
 
