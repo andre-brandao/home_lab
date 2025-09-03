@@ -1,0 +1,33 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  yt-dlp-webui:
+    image: marcobaobao/yt-dlp-webui
+    ports:
+      - 3033:3033
+    networks:
+      - proxy
+    volumes:
+      - /home/deds/yt/Downloads:/downloads
+    healthcheck:
+      test: curl -f http://localhost:3033 || exit 1
+    restart: unless-stopped
+    labels:
+      homepage.group: Social Media
+      homepage.name: You Tube Downloader
+      homepage.icon: youtube-downloader.png
+      homepage.description: A web-based interface for downloading YouTube videos and playlists.
+      homepage.href: https://yt_downloader.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.yt-downloader.entrypoints: web-external
+      traefik.http.routers.yt-downloader.rule: Host(`yt_downloader.adob.dev`)
+      traefik.http.middlewares.yt-downloader-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.yt-downloader.middlewares: yt-downloader-https-redirect
+      traefik.http.routers.yt-downloader-secure.entrypoints: web-secure-external
+      traefik.http.routers.yt-downloader-secure.rule: Host(`yt_downloader.adob.dev`)
+      traefik.http.routers.yt-downloader-secure.tls: true
+      traefik.http.routers.yt-downloader-secure.tls.certresolver: cloudflare
+      traefik.http.routers.yt-downloader-secure.middlewares: tinyauth
