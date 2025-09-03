@@ -5,6 +5,69 @@ REMOTE_HOST="home-ubuntu"
 REMOTE_BASE_DIR="/home/deds"
 DOCKER_DIR="src"
 
+# Action definitions
+ACTION_EXIT="Exit"
+
+# Sync function
+ACTION_SYNC="Sync files"
+sync_files() {
+    local local_dir="$1"
+    local remote_dir="$2"
+
+    gum style --foreground="#0099FF" "Copying ${local_dir} files to ${REMOTE_USER}@${REMOTE_HOST}:${remote_dir}..."
+    rsync -avz --progress --exclude="acme.json" ${local_dir}/ ${REMOTE_USER}@${REMOTE_HOST}:${remote_dir}/
+    return $?
+}
+
+# Docker Compose Functions
+ACTION_COMPOSE_UP="Up (build & start)"
+compose_up() {
+    local remote_dir="$1"
+    gum style --foreground="#0099FF" "Starting docker compose (up -d --build --remove-orphans)..."
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${remote_dir} && docker compose up -d --build --remove-orphans"
+    return $?
+}
+
+ACTION_COMPOSE_DOWN="Down (stop)"
+compose_down() {
+    local remote_dir="$1"
+    gum style --foreground="#0099FF" "Stopping docker compose (down)..."
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${remote_dir} && docker compose down"
+    return $?
+}
+
+ACTION_COMPOSE_RESTART="Restart (restart containers)"
+compose_restart() {
+    local remote_dir="$1"
+    gum style --foreground="#0099FF" "Restarting docker compose..."
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${remote_dir} && docker compose restart"
+    return $?
+}
+
+ACTION_COMPOSE_REBUILD="Rebuild (down, build, up)"
+compose_rebuild() {
+    local remote_dir="$1"
+    gum style --foreground="#0099FF" "Rebuilding and starting docker compose..."
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${remote_dir} && docker compose down && docker compose up -d --build --remove-orphans"
+    return $?
+}
+
+ACTION_COMPOSE_LOGS="Logs (show recent logs)"
+compose_logs() {
+    local remote_dir="$1"
+    gum style --foreground="#0099FF" "Showing docker compose logs (last 50 lines)..."
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${remote_dir} && docker compose logs --tail=50"
+    return $?
+}
+
+ACTION_COMPOSE_STATUS="Status (show container status)"
+compose_status() {
+    local remote_dir="$1"
+    gum style --foreground="#0099FF" "Showing docker compose status..."
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${remote_dir} && docker compose ps"
+    return $?
+}
+
 # Check if gum is installed
 if ! command -v gum &> /dev/null; then
     echo "Error: gum is not installed. Please install it first."
@@ -12,7 +75,7 @@ if ! command -v gum &> /dev/null; then
     exit 1
 fi
 
-# Get list of directories in src/
+
 if [ ! -d "$DOCKER_DIR" ]; then
     echo "Error: $DOCKER_DIR directory not found"
     exit 1
@@ -25,8 +88,8 @@ if [ -z "$DIRECTORIES" ]; then
     exit 1
 fi
 
-# Let user choose directory
-echo "Select a directory to sync:"
+
+echo "Select a directory to work with:"
 SELECTED_DIR=$(echo "$DIRECTORIES" | gum choose --header="Available directories:")
 
 if [ -z "$SELECTED_DIR" ]; then
@@ -43,36 +106,86 @@ echo "Local path: $LOCAL_DIR"
 echo "Remote path: $REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR"
 echo
 
-# Confirm sync operation
-if ! gum confirm "Proceed with syncing $SELECTED_DIR?"; then
-    echo "Sync cancelled."
-    exit 0
-fi
+# Main action loop
+while true; do
+    echo "What would you like to do?"
+    ACTION=$(gum choose --header="Choose an action:" \
+        "$ACTION_SYNC" \
+        "$ACTION_COMPOSE_UP" \
+        "$ACTION_COMPOSE_DOWN" \
+        "$ACTION_COMPOSE_RESTART" \
+        "$ACTION_COMPOSE_REBUILD" \
+        "$ACTION_COMPOSE_LOGS" \
+        "$ACTION_COMPOSE_STATUS" \
+        "$ACTION_EXIT")
 
-echo
-gum style --foreground="#0099FF" "Copying ${LOCAL_DIR} files to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}..."
-rsync -avz --progress --exclude="acme.json" ${LOCAL_DIR}/ ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/
-
-if [ $? -eq 0 ]; then
-    gum style --foreground="#00FF00" "Sync completed successfully!"
-    echo
-
-    # Ask for confirmation before restarting docker compose
-    if gum confirm "Restart docker compose on remote server?"; then
-        echo
-        gum style --foreground="#0099FF" "Restarting docker compose..."
-        ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${REMOTE_DIR} && docker compose up -d --build --remove-orphans"
-
-        if [ $? -eq 0 ]; then
-            gum style --foreground="#00FF00" "Docker compose restarted successfully!"
-        else
-            gum style --foreground="#FF0000" "Error: Failed to restart docker compose"
-            exit 1
-        fi
-    else
-        echo "Docker compose restart skipped."
-    fi
-else
-    gum style --foreground="#FF0000" "Error: Sync failed"
-    exit 1
-fi
+    case "$ACTION" in
+        "$ACTION_SYNC")
+            echo
+            if gum confirm "Proceed with syncing $SELECTED_DIR?"; then
+                if sync_files "$LOCAL_DIR" "$REMOTE_DIR"; then
+                    gum style --foreground="#00FF00" "Sync completed successfully!"
+                else
+                    gum style --foreground="#FF0000" "Error: Sync failed"
+                fi
+            else
+                echo "Sync cancelled."
+            fi
+            echo
+            ;;
+        "$ACTION_COMPOSE_UP")
+            echo
+            if compose_up "$REMOTE_DIR"; then
+                gum style --foreground="#00FF00" "Docker compose started successfully!"
+            else
+                gum style --foreground="#FF0000" "Error: Failed to start docker compose"
+            fi
+            echo
+            ;;
+        "$ACTION_COMPOSE_DOWN")
+            echo
+            if compose_down "$REMOTE_DIR"; then
+                gum style --foreground="#00FF00" "Docker compose stopped successfully!"
+            else
+                gum style --foreground="#FF0000" "Error: Failed to stop docker compose"
+            fi
+            echo
+            ;;
+        "$ACTION_COMPOSE_RESTART")
+            echo
+            if compose_restart "$REMOTE_DIR"; then
+                gum style --foreground="#00FF00" "Docker compose restarted successfully!"
+            else
+                gum style --foreground="#FF0000" "Error: Failed to restart docker compose"
+            fi
+            echo
+            ;;
+        "$ACTION_COMPOSE_REBUILD")
+            echo
+            if compose_rebuild "$REMOTE_DIR"; then
+                gum style --foreground="#00FF00" "Docker compose rebuilt and started successfully!"
+            else
+                gum style --foreground="#FF0000" "Error: Failed to rebuild docker compose"
+            fi
+            echo
+            ;;
+        "$ACTION_COMPOSE_LOGS")
+            echo
+            compose_logs "$REMOTE_DIR"
+            echo
+            ;;
+        "$ACTION_COMPOSE_STATUS")
+            echo
+            compose_status "$REMOTE_DIR"
+            echo
+            ;;
+        "$ACTION_EXIT")
+            gum style --foreground="#00FF00" "Goodbye!"
+            exit 0
+            ;;
+        *)
+            echo "Canceled by user. Exiting."
+            exit 0
+            ;;
+    esac
+done

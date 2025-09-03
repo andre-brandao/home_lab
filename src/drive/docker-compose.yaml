@@ -30,7 +30,7 @@ services:
       retries: 3
     labels:
       - homepage.group=Files
-      - homepage.title=Syncthing
+      - homepage.name=Syncthing
       - homepage.description=Syncthing is a continuous file synchronization program.
       - homepage.icon=syncthing.png
-      - homepage.url=http://home-ubuntu:8384
+      - homepage.href=http://home-ubuntu:8384
