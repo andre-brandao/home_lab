@@ -113,3 +113,34 @@ services:
       traefik.http.routers.dumbassets-secure.rule: Host(`dumbassets.adob.dev`)
       traefik.http.routers.dumbassets-secure.tls: true
       traefik.http.routers.dumbassets-secure.tls.certresolver: cloudflare
+  dumbwhois:
+    image: dumbwareio/dumbwhois:latest
+    container_name: dumbwhois
+    restart: unless-stopped
+    # ports:
+    #   - ${DUMBWHOIS_PORT:-3000}:3000
+    expose:
+      - 3000
+    networks:
+      - proxy
+    environment:
+      - SITE_TITLE=DumbWhois
+    # (Optional) Restrict origins - ex: https://subdomain.domain.tld,https://auth.proxy.tld,http://internalip:port' (empty/default is '*')
+    # - ALLOWED_ORIGINS=${DUMBWHOIS_ALLOWED_ORIGINS:-*}
+    labels:
+      homepage.group: Dumbware
+      homepage.name: DumbWhoIs
+      homepage.description: Domain WhoIs Lookup
+      homepage.icon: dumbwhois.png
+      homepage.href: https://dumbwhois.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.dumbwhois.entrypoints: web-external
+      traefik.http.routers.dumbwhois.rule: Host(`dumbwhois.adob.dev`)
+      traefik.http.middlewares.dumbwhois-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.dumbwhois.middlewares: dumbwhois-https-redirect
+      traefik.http.routers.dumbwhois-secure.middlewares: tinyauth
+      traefik.http.routers.dumbwhois-secure.entrypoints: web-secure-external
+      traefik.http.routers.dumbwhois-secure.rule: Host(`dumbwhois.adob.dev`)
+      traefik.http.routers.dumbwhois-secure.tls: true
+      traefik.http.routers.dumbwhois-secure.tls.certresolver: cloudflare

@@ -16,7 +16,7 @@ services:
     labels:
       homepage.group: Development
       homepage.name: IT Tools
-      homepage.icon: ittools.png
+      homepage.icon: it-tools-light.png
       homepage.description: A collection of useful tools for developers.
       homepage.href: https://it-tools.adob.dev
       traefik.enable: true
@@ -44,7 +44,7 @@ services:
     labels:
       homepage.group: Development
       homepage.name: Omni Tools
-      homepage.icon: omnitools.png
+      homepage.icon: omni-tools.png
       homepage.description: A collection of useful tools for developers.
       homepage.href: https://omni-tools.adob.dev
       traefik.enable: true
