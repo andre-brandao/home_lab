@@ -1,0 +1,245 @@
+networks:
+  proxy:
+    external: true
+  analytics:
+    driver: bridge
+
+volumes:
+  clickhouse-data:
+  postgres-data:
+  redis-data:
+  caddy_data: # Persistent volume for Caddy's certificates and state
+  caddy_config: # Persistent volume for Caddy's configuration cache (optional but good practice)
+
+services:
+  # caddy:
+  #   image: caddy:2.10.0
+  #   container_name: caddy
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "443:443/udp" # Needed for HTTP/3
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile # Mount Caddy config file
+  #     - caddy_data:/data # Mount persistent data volume for certs etc.
+  #     - caddy_config:/config # Mount persistent config volume
+  #   environment:
+  #     # Pass domain name for use in Caddyfile
+  #     # Email is configured via Caddyfile global options
+  #     - DOMAIN_NAME=${DOMAIN_NAME}
+  #   depends_on:
+  #     - backend
+  #     - client
+
+  clickhouse:
+    container_name: clickhouse
+    image: clickhouse/clickhouse-server:25.4.2
+    networks:
+      - analytics
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    configs:
+      - source: clickhouse_network
+        target: /etc/clickhouse-server/config.d/network.xml
+      - source: clickhouse_json
+        target: /etc/clickhouse-server/config.d/enable_json.xml
+      - source: clickhouse_logging
+        target: /etc/clickhouse-server/config.d/logging_rules.xml
+      - source: clickhouse_user_logging
+        target: /etc/clickhouse-server/config.d/user_logging.xml
+    environment:
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-analytics}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-frog}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8123/ping",
+        ]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17.4
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-frog}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-frog}
+      - POSTGRES_DB=${POSTGRES_DB:-analytics}
+    networks:
+      - analytics
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: redis
+  #   ports:
+  #     - "127.0.0.1:6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   restart: unless-stopped
+  #   command: ["redis-server", "--appendonly", "yes"]
+
+  rybbit-api:
+    image: ghcr.io/rybbit-io/rybbit-backend:${IMAGE_TAG:-latest}
+    container_name: rybbit-api
+    # build:
+    #   context: .
+    #   dockerfile: server/Dockerfile
+    # ports:
+    #   - "${HOST_BACKEND_PORT:-127.0.0.1:3001:3001}"
+    networks:
+      - proxy
+      - analytics
+    environment:
+      - NODE_ENV=production
+      - CLICKHOUSE_HOST=http://clickhouse:8123
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-analytics}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-frog}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-analytics}
+      - POSTGRES_USER=${POSTGRES_USER:-frog}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-frog}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BASE_URL=${BASE_URL}
+      - DISABLE_SIGNUP=${DISABLE_SIGNUP}
+      - DISABLE_TELEMETRY=${DISABLE_TELEMETRY}
+      # # Redis configuration
+      # - REDIS_HOST=redis
+      # - REDIS_PORT=6379
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+      # redis:
+      #   condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:3001/api/health",
+        ]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.rybbit-api.entrypoints=web-external"
+      - "traefik.http.routers.rybbit-api.rule=Host(`observe.adob.dev`) && PathPrefix(`/api`)"
+      - "traefik.http.middlewares.rybbit-api-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.rybbit-api.middlewares=rybbit-api-https-redirect"
+      - "traefik.http.routers.rybbit-api-secure.entrypoints=web-secure-external"
+      - "traefik.http.routers.rybbit-api-secure.rule=Host(`observe.adob.dev`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.rybbit-api-secure.tls=true"
+      - "traefik.http.routers.rybbit-api-secure.tls.certresolver=cloudflare"
+      - "traefik.http.services.rybbit-api.loadbalancer.server.port=3001"
+
+  rybbit-client:
+    image: ghcr.io/rybbit-io/rybbit-client:${IMAGE_TAG:-latest}
+    container_name: rybbit-client
+    # build:
+    #   context: .
+    #   dockerfile: client/Dockerfile
+    #   args:
+    #     NEXT_PUBLIC_BACKEND_URL: ${BASE_URL}
+    #     NEXT_PUBLIC_DISABLE_SIGNUP: ${DISABLE_SIGNUP}
+    # ports:
+    #   - "${HOST_CLIENT_PORT:-127.0.0.1:3002:3002}"
+    networks:
+      - proxy
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BACKEND_URL=${BASE_URL}
+      - NEXT_PUBLIC_DISABLE_SIGNUP=${DISABLE_SIGNUP}
+    depends_on:
+      - rybbit-api
+    restart: unless-stopped
+    labels:
+      - "homepage.group=Monitoring"
+      - "homepage.name=Rybbit"
+      - "homepage.description=Web monitoring application"
+      - "homepage.icon=rybbit.png"
+      - "homepage.href=https://observe.adob.dev"
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.rybbit-client.entrypoints=web-external"
+      - "traefik.http.routers.rybbit-client.rule=Host(`observe.adob.dev`)"
+      - "traefik.http.middlewares.rybbit-client-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.rybbit-client.middlewares=rybbit-client-https-redirect"
+      - "traefik.http.routers.rybbit-client-secure.entrypoints=web-secure-external"
+      - "traefik.http.routers.rybbit-client-secure.rule=Host(`observe.adob.dev`)"
+      - "traefik.http.routers.rybbit-client-secure.tls=true"
+      - "traefik.http.routers.rybbit-client-secure.tls.certresolver=cloudflare"
+      - "traefik.http.services.rybbit-client.loadbalancer.server.port=3002"
+
+configs:
+  clickhouse_network:
+    content: |
+      <clickhouse>
+          <listen_host>0.0.0.0</listen_host>
+      </clickhouse>
+
+  clickhouse_json:
+    content: |
+      <clickhouse>
+          <settings>
+              <enable_json_type>1</enable_json_type>
+          </settings>
+      </clickhouse>
+
+  clickhouse_logging:
+    content: |
+      <clickhouse>
+        <logger>
+            <level>warning</level>
+            <console>true</console>
+        </logger>
+        <query_thread_log remove="remove"/>
+        <query_log remove="remove"/>
+        <text_log remove="remove"/>
+        <trace_log remove="remove"/>
+        <metric_log remove="remove"/>
+        <asynchronous_metric_log remove="remove"/>
+        <session_log remove="remove"/>
+        <part_log remove="remove"/>
+        <latency_log remove="remove"/>
+        <processors_profile_log remove="remove"/>
+      </clickhouse>
+
+  clickhouse_user_logging:
+    content: |
+      <clickhouse>
+        <profiles>
+          <default>
+            <log_queries>0</log_queries>
+            <log_query_threads>0</log_query_threads>
+            <log_processors_profiles>0</log_processors_profiles>
+          </default>
+        </profiles>
+      </clickhouse>

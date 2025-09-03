@@ -22,6 +22,7 @@ services:
       - BACKGROUND_IMAGE=https://github.com/andre-brandao/wallpapers/blob/main/abstract105.png?raw=true
       - DOCKER_HOST=http://dockerproxy:2375
       - LOGIN_MAX_RETRIES=50
+      - DISABLE_CONTINUE=true
       # --- Oatuh ----
       # - GITHUB_CLIENT_ID=${GH_CLIENT_ID}
       # - GITHUB_CLIENT_SECRET=${GH_CLIENT_SECRET}
