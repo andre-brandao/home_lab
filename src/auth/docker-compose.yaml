@@ -11,6 +11,8 @@ services:
     restart: unless-stopped
     networks:
       - proxy
+    depends_on:
+      - lldap
     environment:
       # You can generate the SECRET environment variable using openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32 && echo
       - SECRET=${SECRET}
@@ -65,6 +67,7 @@ services:
   lldap:
     image: lldap/lldap:stable
     container_name: lldap
+    restart: unless-stopped
     ports:
       # For LDAP, not recommended to expose, see Usage section.
       #- "3890:3890"
