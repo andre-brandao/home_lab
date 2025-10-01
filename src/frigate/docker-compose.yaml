@@ -1,0 +1,53 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  frigate:
+    container_name: frigate
+    privileged: true # this may not be necessary for all setups
+    restart: unless-stopped
+    stop_grace_period: 30s # allow enough time to shut down the various services
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "512mb" # update for your cameras based on calculation above
+    devices:
+      # - /dev/bus/usb:/dev/bus/usb # Passes the USB Coral, needs to be modified for other versions
+      # - /dev/apex_0:/dev/apex_0 # Passes a PCIe Coral, follow driver instructions here https://coral.ai/docs/m2/get-started/#2a-on-linux
+      # - /dev/video11:/dev/video11 # For Raspberry Pi 4B
+      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/deds/frigate/config:/config
+      - /home/deds/frigate/storage:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "8971:8971"
+      # - "5000:5000" # Internal unauthenticated access. Expose carefully.
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+    environment:
+      FRIGATE_RTSP_PASSWORD: "password" # 17bc0b91a9bc085ecc8b1ce75d5b35cb
+    networks:
+      - proxy
+    labels:
+      homepage.group: Security
+      homepage.name: Frigate
+      homepage.description: NVR with realtime local object detection
+      homepage.icon: frigate.png
+      homepage.href: https://frigate.adob.dev
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.frigate.entrypoints: web-external
+      traefik.http.routers.frigate.rule: Host(`frigate.adob.dev`)
+      traefik.http.middlewares.frigate-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.frigate.middlewares: frigate-https-redirect
+      traefik.http.routers.frigate-secure.middlewares: tinyauth
+      traefik.http.routers.frigate-secure.entrypoints: web-secure-external
+      traefik.http.routers.frigate-secure.rule: Host(`frigate.adob.dev`)
+      traefik.http.routers.frigate-secure.tls: true
+      traefik.http.routers.frigate-secure.tls.certresolver: cloudflare
+      traefik.http.services.frigate.loadbalancer.server.port: 8971
