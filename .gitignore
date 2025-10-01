@@ -1,4 +1,11 @@
 .env
+*.env
+!.env.example
+
+
 cf-token.txt
 
-jelly_test
+sv_otel
+
+bitwarden*
+*_reference

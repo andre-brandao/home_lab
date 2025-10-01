@@ -68,6 +68,15 @@ compose_status() {
     return $?
 }
 
+# New Update action: Pull new images and restart containers
+ACTION_COMPOSE_UPDATE="Update (pull new images & restart)"
+compose_update() {
+    local remote_dir="$1"
+    gum style --foreground="#0099FF" "Updating docker compose: pulling images and restarting containers..."
+    ssh ${REMOTE_USER}@${REMOTE_HOST} "cd ${remote_dir} && docker compose pull && docker compose up -d --build --remove-orphans"
+    return $?
+}
+
 # Check if gum is installed
 if ! command -v gum &> /dev/null; then
     echo "Error: gum is not installed. Please install it first."
@@ -117,6 +126,7 @@ while true; do
         "$ACTION_COMPOSE_REBUILD" \
         "$ACTION_COMPOSE_LOGS" \
         "$ACTION_COMPOSE_STATUS" \
+        "$ACTION_COMPOSE_UPDATE" \
         "$ACTION_EXIT")
 
     case "$ACTION" in
@@ -177,6 +187,15 @@ while true; do
         "$ACTION_COMPOSE_STATUS")
             echo
             compose_status "$REMOTE_DIR"
+            echo
+            ;;
+        "$ACTION_COMPOSE_UPDATE")
+            echo
+            if compose_update "$REMOTE_DIR"; then
+                gum style --foreground="#00FF00" "Docker compose updated successfully!"
+            else
+                gum style --foreground="#FF0000" "Error: Failed to update docker compose"
+            fi
             echo
             ;;
         "$ACTION_EXIT")
