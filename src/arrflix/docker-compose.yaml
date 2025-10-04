@@ -403,12 +403,13 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - type: volume
-        source: configuration
-        target: /config
-        volume:
-          nocopy: true
-          subpath: turtleflix
+      # - type: volume
+      #   source: configuration
+      #   target: /config
+      #   volume:
+      #     nocopy: true
+      #     subpath: turtleflix
+      - ${USERDIR}/docker/turtleflix:/config
       - media_shows:/data/tvshows
       - media_movies:/data/movies
       - ./assets/turtleflix/banner-dark.png:/usr/share/jellyfin/web/assets/img/banner-dark.png
