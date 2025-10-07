@@ -1,0 +1,23 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  drizzle-gate:
+    image: ghcr.io/drizzle-team/gateway:latest
+    container_name: drizzle-gate
+    ports:
+      - 4983:4983 # Set the port for Drizzle Gateway (optional)
+    environment:
+      - PORT=4983 # Set your master pass (optional)
+      - MASTERPASS=${MASTERPASS:-your_master_password}
+      - STORE_PATH=/app # Set your store path (optional)
+    volumes:
+      - ./drizzle-data:/app
+    networks:
+      - proxy
+    labels:
+      - homepage.group=Deployment
+      - homepage.name=Drizzle Gateway
+      - homepage.icon=drizzle.png
+      - homepage.href=http://home-ubuntu:4983
