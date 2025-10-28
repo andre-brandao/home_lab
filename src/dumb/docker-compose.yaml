@@ -29,16 +29,16 @@ services:
       homepage.description: A simple note-taking application
       homepage.icon: dumbpad.png
       homepage.href: https://dumbpad.adob.dev
-      traefik.enable: "true"
+      traefik.enable: 'true'
       traefik.docker.network: proxy
       traefik.http.routers.dumbpad.entrypoints: web-external
       traefik.http.routers.dumbpad.rule: Host(`dumbpad.adob.dev`)
       traefik.http.middlewares.dumbpad-https-redirect.redirectscheme.scheme: https
       traefik.http.routers.dumbpad.middlewares: dumbpad-https-redirect
-      traefik.http.routers.dumbpad-secure.middlewares: tinyauth
+      # traefik.http.routers.dumbpad-secure.middlewares: tinyauth
       traefik.http.routers.dumbpad-secure.entrypoints: web-secure-external
       traefik.http.routers.dumbpad-secure.rule: Host(`dumbpad.adob.dev`)
-      traefik.http.routers.dumbpad-secure.tls: "true"
+      traefik.http.routers.dumbpad-secure.tls: 'true'
       traefik.http.routers.dumbpad-secure.tls.certresolver: cloudflare
 
   dumbbudget:
@@ -62,7 +62,7 @@ services:
       homepage.description: A simple budgeting application
       homepage.icon: dumbudget.png
       homepage.href: https://dumbbudget.adob.dev
-      traefik.enable: "true"
+      traefik.enable: 'true'
       traefik.docker.network: proxy
       traefik.http.routers.dumbbudget.entrypoints: web-external
       traefik.http.routers.dumbbudget.rule: Host(`dumbbudget.adob.dev`)
@@ -71,7 +71,7 @@ services:
       traefik.http.routers.dumbbudget-secure.middlewares: tinyauth
       traefik.http.routers.dumbbudget-secure.entrypoints: web-secure-external
       traefik.http.routers.dumbbudget-secure.rule: Host(`dumbbudget.adob.dev`)
-      traefik.http.routers.dumbbudget-secure.tls: "true"
+      traefik.http.routers.dumbbudget-secure.tls: 'true'
       traefik.http.routers.dumbbudget-secure.tls.certresolver: cloudflare
 
   dumbassets:
@@ -94,7 +94,7 @@ services:
       SITE_TITLE: Deds Assets
       BASE_URL: http://localhost:3000
       DUMBASSETS_PIN: 1234
-      ALLOWED_ORIGINS: "*"
+      ALLOWED_ORIGINS: '*'
       # APPRISE_URL: ${DUMBASSETS_APPRISE_URL:-}
     labels:
       homepage.group: Dumbware
@@ -102,7 +102,7 @@ services:
       homepage.description: A simple asset management application
       homepage.icon: dumbassets.png
       homepage.href: https://dumbassets.adob.dev
-      traefik.enable: "true"
+      traefik.enable: 'true'
       traefik.docker.network: proxy
       traefik.http.routers.dumbassets.entrypoints: web-external
       traefik.http.routers.dumbassets.rule: Host(`dumbassets.adob.dev`)
@@ -111,7 +111,7 @@ services:
       traefik.http.routers.dumbassets-secure.middlewares: tinyauth
       traefik.http.routers.dumbassets-secure.entrypoints: web-secure-external
       traefik.http.routers.dumbassets-secure.rule: Host(`dumbassets.adob.dev`)
-      traefik.http.routers.dumbassets-secure.tls: "true"
+      traefik.http.routers.dumbassets-secure.tls: 'true'
       traefik.http.routers.dumbassets-secure.tls.certresolver: cloudflare
   dumbwhois:
     image: dumbwareio/dumbwhois:latest
@@ -133,7 +133,7 @@ services:
       homepage.description: Domain WhoIs Lookup
       homepage.icon: dumbwhois.png
       homepage.href: https://dumbwhois.adob.dev
-      traefik.enable: "true"
+      traefik.enable: 'true'
       traefik.docker.network: proxy
       traefik.http.routers.dumbwhois.entrypoints: web-external
       traefik.http.routers.dumbwhois.rule: Host(`dumbwhois.adob.dev`)
@@ -142,5 +142,5 @@ services:
       traefik.http.routers.dumbwhois-secure.middlewares: tinyauth
       traefik.http.routers.dumbwhois-secure.entrypoints: web-secure-external
       traefik.http.routers.dumbwhois-secure.rule: Host(`dumbwhois.adob.dev`)
-      traefik.http.routers.dumbwhois-secure.tls: "true"
+      traefik.http.routers.dumbwhois-secure.tls: 'true'
       traefik.http.routers.dumbwhois-secure.tls.certresolver: cloudflare

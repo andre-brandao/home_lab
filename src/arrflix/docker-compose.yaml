@@ -74,16 +74,25 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.qbittorrent-tailscale.entrypoints=web-secure
-      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/qbit`)
+      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/qbit`)
       - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
+        # Strip the /qbit prefix and force trailing slash
       - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.prefixes=/qbit
       - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.forceSlash=true
-      - traefik.http.routers.qbittorrent-tailscale.middlewares=qbittorrent-stripprefix
+        # Add redirect middleware to ensure trailing slash
+      - traefik.http.middlewares.qbittorrent-redirect.redirectregex.regex=^(.*)/qbit$$
+      - traefik.http.middlewares.qbittorrent-redirect.redirectregex.replacement=$${1}/qbit/
+      - traefik.http.middlewares.qbittorrent-redirect.redirectregex.permanent=true
+
+      - traefik.http.routers.qbittorrent-tailscale.middlewares=qbittorrent-redirect,qbittorrent-stripprefix
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    restart: unless-stopped
+
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -101,8 +110,7 @@ services:
           subpath: qbittorrent
       - downloads_complete:/data/completed
       - downloads_incomplete:/data/incomplete
-    restart: unless-stopped
-    network_mode: "service:gluetun"
+    network_mode: 'service:gluetun'
     labels:
       - homepage.group=Arr
       - homepage.name=qBittorrent
@@ -152,7 +160,8 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.prowlarr-tailscale.entrypoints=web-secure
-      - traefik.http.routers.prowlarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/prowlarr`)
+      - traefik.http.routers.prowlarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/prowlarr`)
       - traefik.http.routers.prowlarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.prowlarr.loadbalancer.server.port=9696
 
@@ -170,7 +179,7 @@ services:
       - downloads_complete:/data/completed
       - media_shows:/tvshows
     ports:
-      - "8989:8989"
+      - '8989:8989'
     restart: always
     environment:
       - PUID=${PUID}
@@ -197,7 +206,8 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.sonarr-tailscale.entrypoints=web-secure
-      - traefik.http.routers.sonarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/sonarr`)
+      - traefik.http.routers.sonarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/sonarr`)
       - traefik.http.routers.sonarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.sonarr.loadbalancer.server.port=8989
 
@@ -215,7 +225,7 @@ services:
       - downloads_complete:/data/completed
       - media_movies:/movies
     ports:
-      - "7878:7878"
+      - '7878:7878'
     restart: always
     environment:
       - PUID=${PUID}
@@ -242,7 +252,8 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.radarr-tailscale.entrypoints=web-secure
-      - traefik.http.routers.radarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/radarr`)
+      - traefik.http.routers.radarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/radarr`)
       - traefik.http.routers.radarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.radarr.loadbalancer.server.port=7878
 
@@ -288,7 +299,8 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.bazarr-tailscale.entrypoints=web-secure
-      - traefik.http.routers.bazarr-tailscale.rule=Host(`${TAILNET}`) && PathPrefix(`/bazarr`)
+      - traefik.http.routers.bazarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/bazarr`)
       - traefik.http.routers.bazarr-tailscale.tls.certresolver=vpnresolver
       - traefik.http.services.bazarr.loadbalancer.server.port=6767
 
@@ -315,10 +327,10 @@ services:
       # ./assets/splash/:/usr/share/jellyfin/web/assets/spash/
 
     ports:
-      - "8096:8096"
-      - "8920:8920" # Optional
-      - "7359:7359/udp" # Optional
-      - "1900:1900/udp" # Optional
+      - '8096:8096'
+      - '8920:8920' # Optional
+      - '7359:7359/udp' # Optional
+      - '1900:1900/udp' # Optional
     restart: unless-stopped
     networks:
       - arrflix
@@ -368,7 +380,9 @@ services:
           nocopy: true
           subpath: jellyseerr
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      test:
+        wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status
+        || exit 1
       start_period: 20s
       timeout: 3s
       interval: 15s

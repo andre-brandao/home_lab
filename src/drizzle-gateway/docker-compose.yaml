@@ -6,6 +6,7 @@ services:
   drizzle-gate:
     image: ghcr.io/drizzle-team/gateway:latest
     container_name: drizzle-gate
+    restart: unless-stopped
     ports:
       - 4983:4983 # Set the port for Drizzle Gateway (optional)
     environment:
