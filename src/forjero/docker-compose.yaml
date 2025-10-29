@@ -1,0 +1,45 @@
+networks:
+  forgejo:
+    external: false
+  proxy:
+    external: true
+
+services:
+  server:
+    image: codeberg.org/forgejo/forgejo:13
+    container_name: forgejo
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - FORGEJO____APP_NAME=DedsGit
+      - FORGEJO____APP_SLOGAN=Deds Git Server
+    restart: always
+    networks:
+      - proxy
+      - forgejo
+    volumes:
+      - ./forgejo:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - '3006:3000'
+      - '222:22'
+    labels:
+      homepage.group: Deployment
+      homepage.name: Forjero
+      homepage.description: Self hosted Git server
+      homepage.icon: forjero.png
+      homepage.href: https://git.adob.dev
+      traefik.enable: 'true'
+      traefik.docker.network: proxy
+      traefik.http.routers.forjero.entrypoints: web-external
+      traefik.http.routers.forjero.rule: Host(`git.adob.dev`)
+      traefik.http.middlewares.forjero-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.forjero.middlewares: forjero-https-redirect
+      traefik.http.routers.forjero-secure.middlewares: tinyauth
+
+      traefik.http.routers.forjero-secure.entrypoints: web-secure-external
+      traefik.http.routers.forjero-secure.rule: Host(`git.adob.dev`)
+      traefik.http.routers.forjero-secure.tls: 'true'
+      traefik.http.routers.forjero-secure.tls.certresolver: cloudflare
+      traefik.http.services.forjero.loadbalancer.server.port: 3000
