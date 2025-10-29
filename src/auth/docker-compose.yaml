@@ -6,17 +6,21 @@ networks:
 
 services:
   tinyauth:
-    image: ghcr.io/steveiliop56/tinyauth:v3
+    image: ghcr.io/steveiliop56/tinyauth:v4
     container_name: tinyauth
     restart: unless-stopped
     networks:
       - proxy
     depends_on:
-      - lldap
+      lldap:
+        condition: service_healthy
+    volumes:
+      - ./tinyauth/data:/data
     environment:
       # You can generate the SECRET environment variable using openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32 && echo
       - SECRET=${SECRET}
       - COOKIE_SECURE=true
+      - DISABLE_ANALYTICS=true
       - APP_URL=https://auth.adob.dev
       # You can generate the USER using docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v3 user create --interactive
       # - USERS=${USERS}
@@ -32,13 +36,21 @@ services:
       # - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       # - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 
-      - GENERIC_CLIENT_ID=${POCKETID_CLIENT_ID}
-      - GENERIC_CLIENT_SECRET=${POCKETID_CLIENT_SECRET}
-      - GENERIC_AUTH_URL=https://pid.adob.dev/authorize
-      - GENERIC_TOKEN_URL=https://pid.adob.dev/api/oidc/token
-      - GENERIC_USER_URL=https://pid.adob.dev/api/oidc/userinfo
-      - GENERIC_SCOPES=openid email profile groups
-      - GENERIC_NAME=Pocket ID
+      # - GENERIC_CLIENT_IDu=${POCKETID_CLIENT_ID}
+      # - GENERIC_CLIENT_SECRET=${POCKETID_CLIENT_SECRET}
+      # - GENERIC_AUTH_URL=https://pid.adob.dev/authorize
+      # - GENERIC_TOKEN_URL=https://pid.adob.dev/api/oidc/token
+      # - GENERIC_USER_URL=https://pid.adob.dev/api/oidc/userinfo
+      # - GENERIC_SCOPES=openid email profile groups
+      # - GENERIC_NAME=Pocket ID
+      - PROVIDERS_POCKETID_CLIENT_ID=${POCKETID_CLIENT_ID}
+      - PROVIDERS_POCKETID_CLIENT_SECRET=${POCKETID_CLIENT_SECRET}
+      - PROVIDERS_POCKETID_AUTH_URL=https://pid.adob.dev/authorize
+      - PROVIDERS_POCKETID_TOKEN_URL=https://pid.adob.dev/api/oidc/token
+      - PROVIDERS_POCKETID_USER_INFO_URL=https://pid.adob.dev/api/oidc/userinfo
+      - PROVIDERS_POCKETID_REDIRECT_URL=https://pid.adob.dev/api/oauth/callback/pocketid
+      - PROVIDERS_POCKETID_SCOPES=openid email profile groups
+      - PROVIDERS_POCKETID_NAME=Pocket ID
       # # --- LDAP ---
       - LDAP_ADDRESS=ldap://lldap:3890
       - LDAP_BIND_DN=uid=admin,ou=people,dc=adob,dc=dev
@@ -64,6 +76,7 @@ services:
       traefik.http.routers.tinyauth-secure.rule: Host(`auth.adob.dev`)
       traefik.http.routers.tinyauth-secure.tls: true
       traefik.http.routers.tinyauth-secure.tls.certresolver: cloudflare
+
   lldap:
     image: lldap/lldap:stable
     container_name: lldap
@@ -74,13 +87,13 @@ services:
       # For LDAPS (LDAP Over SSL), enable port if LLDAP_LDAPS_OPTIONS__ENABLED set true, look env below
       #- "6360:6360"
       # For the web front-end
-      - "17170:17170"
+      - '17170:17170'
     networks:
       - proxy
     volumes:
       # - "lldap_data:/data"
       # Alternatively, you can mount a local folder
-      - "./lldap_data:/data"
+      - './lldap_data:/data'
     environment:
       - UID=${PUID}
       - GID=${PGID}
@@ -141,10 +154,10 @@ services:
       - proxy
       - monitoring
     volumes:
-      - "./pid_data:/app/data"
+      - './pid_data:/app/data'
     # Optional healthcheck
     healthcheck:
-      test: ["CMD", "/app/pocket-id", "healthcheck"]
+      test: ['CMD', '/app/pocket-id', 'healthcheck']
       interval: 1m30s
       timeout: 5s
       retries: 2
