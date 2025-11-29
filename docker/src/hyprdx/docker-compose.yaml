@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  hyperdx:
+    image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one
+    ports:
+      # 4318: OpenTelemetry HTTP endpoint
+      # 4317: OpenTelemetry gRPC endpoint
+      # 8080: HyperDX UI
+      # 8123: Clickhouse server
+      - '4322:4318'
+      - '4324:4317'
+      - '8089:8080'
+    labels:
+      homepage.group: Monitoring
+      homepage.name: HyperDX
+      homepage.description: Observability Platform
+      homepage.icon: hyperdx.png
+      homepage.href: http://home-ubuntu:8089

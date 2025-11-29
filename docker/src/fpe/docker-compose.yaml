@@ -1,0 +1,27 @@
+version: "3.8"
+
+networks:
+  proxy:
+    external: true
+
+services:
+  hikifpe-proxy:
+    image: nginx:alpine
+    container_name: hikifpe-proxy
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.fpe.entrypoints: web-external
+      traefik.http.routers.fpe.rule: Host(`fpe.adob.dev`)
+      traefik.http.middlewares.fpe-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.fpe.middlewares: fpe-https-redirect
+      traefik.http.routers.fpe-secure.middlewares: tinyauth
+      traefik.http.routers.fpe-secure.entrypoints: web-secure-external
+      traefik.http.routers.fpe-secure.rule: Host(`fpe.adob.dev`)
+      traefik.http.routers.fpe-secure.tls: true
+      traefik.http.routers.fpe-secure.tls.certresolver: cloudflare

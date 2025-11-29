@@ -10,7 +10,7 @@ networks:
 
 services:
   traefik:
-    image: traefik:v3.3
+    image: traefik:v3.6
     container_name: traefik
     restart: unless-stopped
 
@@ -39,11 +39,11 @@ services:
       - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.crt:/certs/home-ubuntu.fable-company.ts.net.crt
       - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.key:/certs/home-ubuntu.fable-company.ts.net.key
     ports:
-      - "80:80/tcp"
-      - "443:443/tcp"
-      - "443:443/udp"
-      - "8080:8080" # Dashboard port
-      - "8082:8082" # Metrics port
+      - '80:80/tcp'
+      - '443:443/tcp'
+      - '443:443/udp'
+      - '8080:8080' # Dashboard port
+      - '8082:8082' # Metrics port
     labels:
       - homepage.group=Deployment
       - homepage.name=Traefik
@@ -52,30 +52,30 @@ services:
       - homepage.href=http://home-ubuntu:8080
       - homepage.widget.type=traefik
       - homepage.widget.url=http://traefik:8080
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.entrypoints=web-external"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.adob.dev`)"
-      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
-      - "traefik.http.routers.traefik-secure.entrypoints=web-secure-external"
-      - "traefik.http.routers.traefik-secure.rule=Host(`traefik.adob.dev`)"
-      - "traefik.http.routers.traefik-secure.middlewares=tinyauth"
-      - "traefik.http.routers.traefik-secure.tls=true"
-      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].main=adob.dev"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.adob.dev"
-      - "traefik.http.routers.traefik-secure.service=api@internal"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.entrypoints=web-external'
+      - 'traefik.http.routers.traefik.rule=Host(`traefik.adob.dev`)'
+      - 'traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https'
+      - 'traefik.http.routers.traefik.middlewares=traefik-https-redirect'
+      - 'traefik.http.routers.traefik-secure.entrypoints=web-secure-external'
+      - 'traefik.http.routers.traefik-secure.rule=Host(`traefik.adob.dev`)'
+      - 'traefik.http.routers.traefik-secure.middlewares=tinyauth'
+      - 'traefik.http.routers.traefik-secure.tls=true'
+      - 'traefik.http.routers.traefik-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].main=adob.dev'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].sans=*.adob.dev'
+      - 'traefik.http.routers.traefik-secure.service=api@internal'
 
   cloudflared:
     container_name: cloudflare-tunnel
-    image: "cloudflare/cloudflared:latest"
+    image: 'cloudflare/cloudflared:latest'
     restart: unless-stopped
-    command: "tunnel --no-autoupdate --metrics 0.0.0.0:2000 run"
+    command: 'tunnel --no-autoupdate --metrics 0.0.0.0:2000 run'
     environment:
-      - "TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}"
+      - 'TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}'
     ports:
-      - "2000:2000"
+      - '2000:2000'
     networks:
       - proxy
       - monitoring

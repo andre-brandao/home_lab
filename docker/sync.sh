@@ -1,8 +1,11 @@
 #!/bin/sh
 
-REMOTE_USER="deds"
-REMOTE_HOST="home-ubuntu"
-REMOTE_BASE_DIR="/home/deds"
+REMOTE_USER="docker"
+# REMOTE_USER="deds"
+# REMOTE_HOST="home-ubuntu"
+REMOTE_HOST="docker-1"
+
+REMOTE_BASE_DIR="/home/docker/stacks"
 DOCKER_DIR="src"
 
 # Action definitions

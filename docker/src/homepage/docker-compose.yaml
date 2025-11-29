@@ -1,9 +1,5 @@
 networks:
-  arrflix:
-    external: true
   proxy:
-    external: true
-  monitoring:
     external: true
 services:
   homepage:
@@ -12,9 +8,7 @@ services:
     ports:
       - 6969:3000
     networks:
-      - arrflix
       - proxy
-      - monitoring
     volumes:
       - ./config:/app/config
       # - /var/run/docker.sock:/var/run/docker.sock
@@ -24,7 +18,7 @@ services:
       # PUID: ${PUID:-1000}
       # PGID: ${PGID:-1000}
       TZ: ${TZ:-UTC}
-      HOMEPAGE_ALLOWED_HOSTS: "*"
+      HOMEPAGE_ALLOWED_HOSTS: '*'
       LOG_TARGETS: /app/logs/homepage.log
     restart: unless-stopped
     labels:

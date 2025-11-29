@@ -9,3 +9,9 @@ sv_otel
 
 bitwarden*
 *_reference
+turtleflix/
+.terraform
+
+beszel_agent_data
+
+local.tfvars

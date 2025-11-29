@@ -98,17 +98,17 @@ services:
       LANGFUSE_INIT_USER_NAME: ${LANGFUSE_INIT_USER_NAME:-}
       LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:-}
     labels:
-      - "homepage.group=Monitoring"
-      - "homepage.name=Langfuse"
-      - "homepage.description=LLM Monitoring"
-      - "homepage.icon=langfuse.png"
-      - "homepage.href=http://home-ubuntu:5171"
+      - 'homepage.group=Monitoring'
+      - 'homepage.name=Langfuse'
+      - 'homepage.description=LLM Monitoring'
+      - 'homepage.icon=langfuse.png'
+      - 'homepage.href=http://home-ubuntu:5171'
 
   langfuse-clickhouse:
     container_name: langfuse-clickhouse
     image: docker.io/clickhouse/clickhouse-server
     restart: always
-    user: "101:101"
+    user: '101:101'
     networks:
       - langfuse
     environment:
@@ -125,7 +125,9 @@ services:
     #   - 127.0.0.1:8123:8123
     #   - 127.0.0.1:9000:9000
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      test:
+        wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit
+        1
       interval: 5s
       timeout: 5s
       retries: 10
@@ -139,21 +141,48 @@ services:
     networks:
       - langfuse
     # create the 'langfuse' bucket before starting the service
-    command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'
+    command:
+      -c 'mkdir -p /data/langfuse && minio server --address ":9000"
+      --console-address ":9001" /data'
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
       - 9092:9000
-      - 127.0.0.1:9091:9001
+      # - 127.0.0.1:9091:9001
+      - 9091:9001
+
     volumes:
       - langfuse_minio_data:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ['CMD', 'mc', 'ready', 'local']
       interval: 1s
       timeout: 5s
       retries: 5
       start_period: 1s
+    labels:
+      homepage.group: Deployment
+      homepage.name: S3 MinIO
+      homepage.description: A simple storage system that is open source
+      homepage.icon: minio.png
+      homepage.href: https://minio.console.adob.dev
+      traefik.enable: 'true'
+      traefik.docker.network: proxy
+
+      traefik.http.routers.myminio.entrypoints: web-secure-external
+      traefik.http.routers.myminio.rule: Host(`minio.adob.dev`)
+      traefik.http.routers.myminio.service: myminio
+      traefik.http.services.myminio.loadbalancer.server.port: 9000
+      traefik.http.routers.myminio.tls: 'true'
+      traefik.http.routers.myminio.tls.certresolver: cloudflare
+
+      traefik.http.routers.minio-console.entrypoints: web-secure-external
+      traefik.http.routers.minio-console.rule: Host(`minio-console.adob.dev`)
+      traefik.http.routers.minio-console.service: minio-console
+      traefik.http.routers.minio-console.middlewares: tinyauth
+      traefik.http.routers.minio-console.tls: 'true'
+      traefik.http.routers.minio-console.tls.certresolver: cloudflare
+      traefik.http.services.minio-console.loadbalancer.server.port: 9001
 
   langfuse-redis:
     container_name: langfuse-redis
@@ -169,7 +198,7 @@ services:
     # ports:
     #   - 127.0.0.1:6379:6379
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 3s
       timeout: 10s
       retries: 10
@@ -181,7 +210,7 @@ services:
     networks:
       - langfuse
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 3s
       timeout: 3s
       retries: 10

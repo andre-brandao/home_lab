@@ -13,6 +13,10 @@ http:
         contentSecurityPolicy: "default-src 'self'"
         customRequestHeaders:
           X-Forwarded-Proto: https
+        accessControlAllowCredentials: true
+        accessControlAllowOrigin: "https://auth.adob.dev,https://pid.adob.dev"
+        accessControlAllowHeaders: "Content-Type,Authorization,X-Requested-With"
+        accessControlAllowMethods: "GET,POST,PUT,DELETE,OPTIONS"
     https-redirectscheme:
       redirectScheme:
         scheme: https
