@@ -33,7 +33,7 @@ variable "nodes" {
   type = map(object({
     host_node      = string
     machine_type   = string
-    datastore_id   = optional(string, "samsung-500gb")
+    datastore_id   = optional(string, "local-zfs")
     ip             = string
     dns            = optional(list(string))
     network_bridge = string

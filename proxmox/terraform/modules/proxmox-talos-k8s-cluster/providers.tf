@@ -31,7 +31,7 @@ provider "flux" {
     cluster_ca_certificate = base64decode(talos_cluster_kubeconfig.this.kubernetes_client_configuration.ca_certificate)
   }
   git = {
-    url = "ssh://git@gitea.imkumpy.in/${var.flux_bootstrap_repo.username}/${var.flux_bootstrap_repo.name}.git"
+    url = "ssh://git@git:222/${var.flux_bootstrap_repo.username}/${var.flux_bootstrap_repo.name}.git"
     ssh = {
       username    = "git"
       private_key = tls_private_key.ed25519.private_key_openssh
