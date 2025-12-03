@@ -43,6 +43,18 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
       - qemu-guest-agent
       - net-tools
       - curl
+    write_files:
+      - path: /home/git/tea/docker-compose.yml
+        content: |
+              ${indent(10, file("${path.module}/template/docker-compose.yaml"))}
+        owner: 'git:docker'
+        defer: true
+      - path: /etc/systemd/system/tea.service
+        content: |
+              ${indent(10, file("${path.module}/template/tea.service"))}
+        owner: 'root:root'
+        permissions: '0644'
+        defer: true
     runcmd:
       - systemctl enable qemu-guest-agent
       - systemctl start qemu-guest-agent
@@ -60,21 +72,13 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
         EOF_D
       - apt update
       - apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+      - mkdir -p /home/git/tea
+      - chown -R git:docker /home/git/tea
+      - systemctl daemon-reload
+      - systemctl enable tea.service
       - echo "done" > /tmp/cloud-config.done
       - reboot
     EOF
-    # write_files:
-    #   - path: /home/git/tea/docker-compose.yml
-    #     content: |
-    #           ${indent(10, file("${path.module}/template/docker-compose.yaml"))}
-    #     owner: 'git:docker'
-    #     defer: true
-    #   - path: /etc/systemd/system/tea.service
-    #     content: |
-    #           ${indent(10, file("${path.module}/template/tea.service"))}
-    #     owner: 'root:root'
-    #     permissions: '0644'
-    #       defer: true
 
     file_name = "ubuntu-vm-cloud-config.yaml"
 
