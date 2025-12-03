@@ -1,0 +1,17 @@
+terraform {
+  backend "s3" {
+    bucket = "terraform"
+    key    = "git-server/terraform.tfstate"
+    region = "us-east-1"
+
+    # MinIO-specific configuration
+    endpoint                    = "http://truenas:9000"
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    force_path_style            = true # Required for MinIO
+    # Access credentials (use environment variables for security)
+    # access_key = "your-access-key"  # Better to use AWS_ACCESS_KEY_ID env var
+    # secret_key = "your-secret-key"  # Better to use AWS_SECRET_ACCESS_KEY env var
+  }
+}

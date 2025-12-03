@@ -1,5 +1,6 @@
 .env
 *.env
+.envrc
 !.env.example
 
 
@@ -15,3 +16,4 @@ turtleflix/
 beszel_agent_data
 
 local.tfvars
+.direnv

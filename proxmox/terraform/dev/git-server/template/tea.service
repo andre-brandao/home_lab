@@ -1,0 +1,16 @@
+[Unit]
+Description=Docker Application Container Engine
+After=network.target docker.socket
+
+[Service]
+RestartSec=2s
+Restart=always
+Type=simple
+User=git
+Group=docker
+WorkingDirectory=/home/git/tea
+ExecStart=/usr/local/bin/docker-compose up
+ExecStop=/usr/local/bin/docker-compose down
+
+[Install]
+WantedBy=multi-user.target
