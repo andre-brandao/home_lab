@@ -4,17 +4,23 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   description = "Managed by Terraform"
   tags        = ["terraform", "ubuntu"]
   node_name   = "pve"
+  bios = "ovmf"
 
+  efi_disk {
+    datastore_id = "local-zfs"
+    pre_enrolled_keys = false
+  }
   agent {
     enabled = true
   }
 
   cpu {
     cores = 2
+    type  = "host"
   }
 
   memory {
-    dedicated = 2048
+    dedicated = 4096
   }
 
   disk {
@@ -29,21 +35,12 @@ resource "proxmox_virtual_environment_vm" "ubuntu_vm" {
   initialization {
     # uncomment and specify the datastore for cloud-init disk if default `local-lvm` is not available
     datastore_id = "local-zfs"
-
+    interface = "scsi1" # or scsi2, scsi3,...
     ip_config {
       ipv4 {
         address = "dhcp"
       }
     }
-
-    # user_account {
-    #   username = "git"
-    #   password = random_password.ubuntu_vm_password.result
-    #   keys = [
-    #     trimspace(file("~/.ssh/id_ed25519.pub")),
-    #     trimspace(file("~/.ssh/pve.pub"))
-    #   ]
-    # }
 
     user_data_file_id = proxmox_virtual_environment_file.user_data_cloud_config.id
   }

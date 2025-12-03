@@ -63,18 +63,18 @@ resource "proxmox_virtual_environment_file" "user_data_cloud_config" {
       - echo "done" > /tmp/cloud-config.done
       - reboot
     EOF
-      # write_files:
-      #   - path: /home/git/tea/docker-compose.yml
-      #     content: |
-      #         ${indent(10, file("${path.module}/template/docker-compose.yaml"))}
-      #     owner: 'git:docker'
-      #     defer: true
-      #   - path: /etc/systemd/system/tea.service
-      #     content: |
-      #         ${indent(10, file("${path.module}/template/tea.service"))}
-      #     owner: 'root:root'
-      #     permissions: '0644'
-      #     defer: true
+    # write_files:
+    #   - path: /home/git/tea/docker-compose.yml
+    #     content: |
+    #           ${indent(10, file("${path.module}/template/docker-compose.yaml"))}
+    #     owner: 'git:docker'
+    #     defer: true
+    #   - path: /etc/systemd/system/tea.service
+    #     content: |
+    #           ${indent(10, file("${path.module}/template/tea.service"))}
+    #     owner: 'root:root'
+    #     permissions: '0644'
+    #       defer: true
 
     file_name = "ubuntu-vm-cloud-config.yaml"
 
