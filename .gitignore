@@ -17,3 +17,5 @@ beszel_agent_data
 
 local.tfvars
 .direnv
+
+debug

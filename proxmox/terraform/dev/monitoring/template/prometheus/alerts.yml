@@ -1,0 +1,145 @@
+groups:
+  - name: monitoring_alerts
+    interval: 30s
+    rules:
+      # Instance down alerts
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+
+      # Host alerts
+      - alert: HostOutOfMemory
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host out of memory (instance {{ $labels.instance }})"
+          description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: HostMemoryUnderMemoryPressure
+        expr: rate(node_vmstat_pgmajfault[1m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host memory under memory pressure (instance {{ $labels.instance }})"
+          description: "The node is under heavy memory pressure. High rate of major page faults\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: HostOutOfDiskSpace
+        expr: (node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes < 10 and ON (instance, device, mountpoint) node_filesystem_readonly == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host out of disk space (instance {{ $labels.instance }})"
+          description: "Disk is almost full (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: HostDiskWillFillIn24Hours
+        expr: (node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes < 10 and ON (instance, device, mountpoint) predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs"}[1h], 24 * 3600) < 0 and ON (instance, device, mountpoint) node_filesystem_readonly == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host disk will fill in 24 hours (instance {{ $labels.instance }})"
+          description: "Filesystem is predicted to run out of space within the next 24 hours at current write rate\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host high CPU load (instance {{ $labels.instance }})"
+          description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      # Container alerts
+      - alert: ContainerKilled
+        expr: time() - container_last_seen > 60
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container killed (instance {{ $labels.instance }})"
+          description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: ContainerCpuUsage
+        expr: (sum(rate(container_cpu_usage_seconds_total[3m])) BY (instance, name) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container CPU usage (instance {{ $labels.instance }})"
+          description: "Container CPU usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: ContainerMemoryUsage
+        expr: (sum(container_memory_working_set_bytes) BY (instance, name) / sum(container_spec_memory_limit_bytes > 0) BY (instance, name) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container Memory usage (instance {{ $labels.instance }})"
+          description: "Container Memory usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      # Prometheus alerts
+      - alert: PrometheusConfigurationReloadFailure
+        expr: prometheus_config_last_reload_successful != 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus configuration reload failure (instance {{ $labels.instance }})"
+          description: "Prometheus configuration reload error\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: PrometheusTooManyRestarts
+        expr: changes(process_start_time_seconds{job=~"prometheus|pushgateway|alertmanager"}[15m]) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus too many restarts (instance {{ $labels.instance }})"
+          description: "Prometheus has restarted more than twice in the last 15 minutes. It might be crashlooping.\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      - alert: PrometheusAlertmanagerConfigurationReloadFailure
+        expr: alertmanager_config_last_reload_successful != 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus AlertManager configuration reload failure (instance {{ $labels.instance }})"
+          description: "AlertManager configuration reload error\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      # Grafana alerts
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Grafana is down"
+          description: "Grafana instance is down\n  LABELS: {{ $labels }}"
+
+      # Jaeger alerts
+      - alert: JaegerDown
+        expr: up{job="jaeger"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Jaeger is down"
+          description: "Jaeger tracing instance is down\n  LABELS: {{ $labels }}"
+
+      # InfluxDB alerts
+      - alert: InfluxDBDown
+        expr: up{job="influxdb"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "InfluxDB is down"
+          description: "InfluxDB instance is down\n  LABELS: {{ $labels }}"

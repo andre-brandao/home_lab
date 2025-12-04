@@ -6,17 +6,17 @@ http:
         contentTypeNosniff: true # X-Content-Type-Options=nosniff
         forceSTSHeader: true # Add the Strict-Transport-Security header even when the connection is HTTP
         frameDeny: false # X-Frame-Options=deny
-        referrerPolicy: "strict-origin-when-cross-origin"
+        referrerPolicy: 'strict-origin-when-cross-origin'
         stsIncludeSubdomains: true # Add includeSubdomains to the Strict-Transport-Security header
         stsPreload: true # Add preload flag appended to the Strict-Transport-Security header
         stsSeconds: 3153600 # Set the max-age of the Strict-Transport-Security header (63072000 = 2 years)
         contentSecurityPolicy: "default-src 'self'"
         customRequestHeaders:
-          X-Forwarded-Proto: https
-        accessControlAllowCredentials: true
-        accessControlAllowOrigin: "https://auth.adob.dev,https://pid.adob.dev"
-        accessControlAllowHeaders: "Content-Type,Authorization,X-Requested-With"
-        accessControlAllowMethods: "GET,POST,PUT,DELETE,OPTIONS"
+        #   X-Forwarded-Proto: https
+        # accessControlAllowCredentials: true
+        # accessControlAllowOrigin: "https://auth.adob.dev,https://pid.adob.dev"
+        # accessControlAllowHeaders: "Content-Type,Authorization,X-Requested-With"
+        # accessControlAllowMethods: "GET,POST,PUT,DELETE,OPTIONS"
     https-redirectscheme:
       redirectScheme:
         scheme: https

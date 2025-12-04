@@ -24,6 +24,7 @@
             terraform-docs
             trivy
             gitleaks
+            cloud-init
           ];
 
           # Define the versions we want to use
