@@ -47,17 +47,17 @@ services:
       - homepage.widget.url=http://traefik:8080
       - 'traefik.enable=true'
       - 'traefik.http.routers.traefik.entrypoints=web-external'
-      - 'traefik.http.routers.traefik.rule=Host(`traefik.adob.dev`)'
+      - 'traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)'
       - 'traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https'
       - 'traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https'
       - 'traefik.http.routers.traefik.middlewares=traefik-https-redirect'
       - 'traefik.http.routers.traefik-secure.entrypoints=web-secure-external'
-      - 'traefik.http.routers.traefik-secure.rule=Host(`traefik.adob.dev`)'
+      - 'traefik.http.routers.traefik-secure.rule=Host(`traefik.${DOMAIN}`)'
       - 'traefik.http.routers.traefik-secure.middlewares=tinyauth'
       - 'traefik.http.routers.traefik-secure.tls=true'
       - 'traefik.http.routers.traefik-secure.tls.certresolver=cloudflare'
-      - 'traefik.http.routers.traefik-secure.tls.domains[0].main=adob.dev'
-      - 'traefik.http.routers.traefik-secure.tls.domains[0].sans=*.adob.dev'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].main=${DOMAIN}'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].sans=*.${DOMAIN}'
       - 'traefik.http.routers.traefik-secure.service=api@internal'
 
   cloudflared:
@@ -71,7 +71,6 @@ services:
       - '2000:2000'
     networks:
       - proxy
-      - monitoring
     labels:
       - homepage.group=Deployment
       - homepage.name=Cloudflare Tunnel

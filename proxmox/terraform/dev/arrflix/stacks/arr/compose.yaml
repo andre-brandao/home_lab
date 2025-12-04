@@ -20,25 +20,25 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${DATADIR}/media/tvshows
+      device: ${DATADIR}/tvshows
   media_movies:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DATADIR}/media/movies
+      device: ${DATADIR}/movies
   downloads_complete:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DATADIR}/Downloads/completed
+      device: ${DATADIR}/downloads/completed
   downloads_incomplete:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${DATADIR}/Downloads/incomplete
+      device: ${DATADIR}/downloads/incomplete
 
 services:
   gluetun:
@@ -348,11 +348,11 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.jellyfin.entrypoints=web-external
-      - traefik.http.routers.jellyfin.rule=Host(`dedsflix.${DOMAIN}`)
+      - traefik.http.routers.jellyfin.rule=Host(`gaspar.${DOMAIN}`)
       - traefik.http.middlewares.jellyfin-https-redirect.redirectscheme.scheme=https
       - traefik.http.routers.jellyfin.middlewares=jellyfin-https-redirect
       - traefik.http.routers.jellyfin-secure.entrypoints=web-secure-external
-      - traefik.http.routers.jellyfin-secure.rule=Host(`dedsflix.${DOMAIN}`)
+      - traefik.http.routers.jellyfin-secure.rule=Host(`gaspar.${DOMAIN}`)
       - traefik.http.routers.jellyfin-secure.tls=true
       - traefik.http.routers.jellyfin-secure.tls.certresolver=cloudflare
       - traefik.http.routers.jellyfin-secure.service=jellyfin
@@ -400,11 +400,11 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxy
       - traefik.http.routers.jellyseerr.entrypoints=web-external
-      - traefik.http.routers.jellyseerr.rule=Host(`flixrequest.${DOMAIN}`)
+      - traefik.http.routers.jellyseerr.rule=Host(`request.${DOMAIN}`)
       - traefik.http.middlewares.jellyseerr-https-redirect.redirectscheme.scheme=https
       - traefik.http.routers.jellyseerr.middlewares=jellyseerr-https-redirect
       - traefik.http.routers.jellyseerr-secure.entrypoints=web-secure-external
-      - traefik.http.routers.jellyseerr-secure.rule=Host(`flixrequest.${DOMAIN}`)
+      - traefik.http.routers.jellyseerr-secure.rule=Host(`request.${DOMAIN}`)
       - traefik.http.routers.jellyseerr-secure.tls=true
       - traefik.http.routers.jellyseerr-secure.tls.certresolver=cloudflare
       # - traefik.http.routers.jellyseerr-secure.service=jellyseerr

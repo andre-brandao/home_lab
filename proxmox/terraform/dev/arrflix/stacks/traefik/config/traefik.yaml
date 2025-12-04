@@ -50,8 +50,8 @@ providers:
     watch: true
 
 certificatesResolvers:
-  # vpnresolver:
-  #   tailscale: {}
+  vpnresolver:
+    tailscale: {}
   cloudflare:
     acme:
       # caServer: https://acme-v02.api.letsencrypt.org/directory # production (default)
