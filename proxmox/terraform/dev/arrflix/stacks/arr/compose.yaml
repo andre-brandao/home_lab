@@ -1,0 +1,410 @@
+name: arrflix
+# https://wiki.servarr.com/useful-tools#using-environment-variables-for-config
+
+networks:
+  arrflix:
+    driver: bridge
+    name: arrflix
+  proxy:
+    external: true
+
+volumes:
+  configuration:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${USERDIR}/docker
+  media_shows:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/media/tvshows
+  media_movies:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/media/movies
+  downloads_complete:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/Downloads/completed
+  downloads_incomplete:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATADIR}/Downloads/incomplete
+
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 8000:8000/tcp # gluetun api
+      - 5656:5656 # port for qbit web ui
+      - 6881:6881 # port for qbit port forward if your VPN supports this
+      - 6881:6881/udp # port for qbit port forward if your VPN supports this
+    networks:
+      - arrflix
+      - proxy
+    environment:
+      - VPN_SERVICE_PROVIDER=protonvpn
+      # - VPN_TYPE=wireguard
+      # - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_COUNTRIES=Brazil
+    labels:
+      - homepage.group=Arr
+      - homepage.name=GlueTun
+      - homepage.icon=gluetun.png
+      - homepage.description=VPN service for Arrflix
+      - homepage.widget.type=gluetun
+      - homepage.widget.url=http://gluetun:8000
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.qbittorrent-tailscale.entrypoints=web-secure
+      - traefik.http.routers.qbittorrent-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/qbit`)
+      - traefik.http.routers.qbittorrent-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.services.qbittorrent.loadbalancer.server.port=5656
+        # Strip the /qbit prefix and force trailing slash
+      - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.prefixes=/qbit
+      - traefik.http.middlewares.qbittorrent-stripprefix.stripprefix.forceSlash=true
+        # Add redirect middleware to ensure trailing slash
+      - traefik.http.middlewares.qbittorrent-redirect.redirectregex.regex=^(.*)/qbit$$
+      - traefik.http.middlewares.qbittorrent-redirect.redirectregex.replacement=$${1}/qbit/
+      - traefik.http.middlewares.qbittorrent-redirect.redirectregex.permanent=true
+
+      - traefik.http.routers.qbittorrent-tailscale.middlewares=qbittorrent-redirect,qbittorrent-stripprefix
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=5656
+      - TORRENTING_PORT=6881
+    # mem_limit: 4g
+
+    volumes:
+      - type: volume
+        source: configuration
+        target: /config
+        volume:
+          nocopy: true
+          subpath: qbittorrent
+      - downloads_complete:/data/completed
+      - downloads_incomplete:/data/incomplete
+    network_mode: 'service:gluetun'
+    labels:
+      - homepage.group=Arr
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent.png
+      - homepage.href=https://${TAILNET}/qbit
+      - homepage.description=Torrent client
+      - homepage.widget.type=qbittorrent
+      - homepage.widget.url=http://gluetun:5656
+      - homepage.widget.username=admin
+      - homepage.widget.password=${HTTP_PASSWORD}
+      - homepage.widget.enableLeechProgress=true
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PROWLARR__AUTH__APIKEY=${PROWLARR_KEY}
+      - PROWLARR__PORT=9696
+      - PROWLARR__SERVER__URLBASE=/prowlarr
+      - PROWLARR__LOG__LEVEL=info
+      - PROWLARR__AUTH__AUTHENTICATION_REQUIRED=false
+    volumes:
+      - type: volume
+        source: configuration
+        target: /config
+        volume:
+          nocopy: true
+          subpath: prowlarr
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    networks:
+      - arrflix
+      - proxy
+    labels:
+      - homepage.group=Arr
+      - homepage.name=prowlarr
+      - homepage.icon=prowlarr.png
+      - homepage.href=https://${TAILNET}/prowlarr
+      - homepage.description=Indexer
+      - homepage.widget.type=prowlarr
+      - homepage.widget.url=http://prowlarr:9696
+      - homepage.widget.key=${PROWLARR_KEY}
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.prowlarr-tailscale.entrypoints=web-secure
+      - traefik.http.routers.prowlarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/prowlarr`)
+      - traefik.http.routers.prowlarr-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.services.prowlarr.loadbalancer.server.port=9696
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - type: volume
+        source: configuration
+        target: /config
+        volume:
+          nocopy: true
+          subpath: sonarr
+      - downloads_complete:/data/completed
+      - media_shows:/tvshows
+    ports:
+      - '8989:8989'
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - SONARR__AUTH__APIKEY=${SONARR_KEY}
+      - SONARR__PORT=8989
+      - SONARR__SERVER__URLBASE=/sonarr
+      - SONARR__LOG__LEVEL=info
+      - SONARR__AUTH__AUTHENTICATION_REQUIRED=false
+    networks:
+      - arrflix
+      - proxy
+    labels:
+      - homepage.group=Media
+      - homepage.name=Sonarr
+      - homepage.icon=sonarr.png
+      - homepage.href=https://${TAILNET}/sonarr
+      - homepage.description=TV Series Management
+      - homepage.widget.type=sonarr
+      - homepage.widget.url=http://sonarr:8989
+      - homepage.widget.key=${SONARR_KEY}
+      # - homepage.widget.enableQueue=true
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.sonarr-tailscale.entrypoints=web-secure
+      - traefik.http.routers.sonarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/sonarr`)
+      - traefik.http.routers.sonarr-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.services.sonarr.loadbalancer.server.port=8989
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - type: volume
+        source: configuration
+        target: /config
+        volume:
+          nocopy: true
+          subpath: radarr
+      - downloads_complete:/data/completed
+      - media_movies:/movies
+    ports:
+      - '7878:7878'
+    restart: always
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - RADARR__AUTH__APIKEY=${RADARR_KEY}
+      - RADARR__PORT=7878
+      - RADARR__SERVER__URLBASE=/radarr
+      - RADARR__LOG__LEVEL=info
+      - RADARR__AUTH__AUTHENTICATION_REQUIRED=false
+    networks:
+      - arrflix
+      - proxy
+    labels:
+      - homepage.group=Media
+      - homepage.name=Radarr
+      - homepage.icon=radarr.png
+      - homepage.href=https://${TAILNET}/radarr
+      - homepage.description=Movie Management
+      - homepage.widget.type=radarr
+      - homepage.widget.url=http://radarr:7878
+      - homepage.widget.key=${RADARR_KEY}
+      - homepage.widget.enableQueue=true
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.radarr-tailscale.entrypoints=web-secure
+      - traefik.http.routers.radarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/radarr`)
+      - traefik.http.routers.radarr-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.services.radarr.loadbalancer.server.port=7878
+
+  bazarr:
+    container_name: bazarr
+    image: lscr.io/linuxserver/bazarr:latest
+    restart: unless-stopped
+    # logging:
+    #   driver: json-file
+    # network_mode: bridge
+    networks:
+      - arrflix
+      - proxy
+    ports:
+      - 6767:6767
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - BAZARR__AUTH__APIKEY=${BAZARR_KEY}
+      - BAZARR__PORT=6767
+      - BAZARR__SERVER__URLBASE=/bazarr
+      - BAZARR__LOG__LEVEL=info
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - type: volume
+        source: configuration
+        target: /config
+        volume:
+          nocopy: true
+          subpath: bazarr
+      - media_shows:/tvshows
+      - media_movies:/movies
+    labels:
+      - homepage.group=Media
+      - homepage.name=bazarr
+      - homepage.icon=bazarr.png
+      - homepage.href=https://${TAILNET}/bazarr
+      - homepage.description=Subtitle Management
+      - homepage.widget.type=bazarr
+      - homepage.widget.url=http://bazarr:6767/bazarr
+      - homepage.widget.key=${BAZARR_KEY}
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.bazarr-tailscale.entrypoints=web-secure
+      - traefik.http.routers.bazarr-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/bazarr`)
+      - traefik.http.routers.bazarr-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.services.bazarr.loadbalancer.server.port=6767
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - type: volume
+        source: configuration
+        target: /config
+        volume:
+          nocopy: true
+          subpath: jellyfin
+      - media_shows:/data/tvshows
+      - media_movies:/data/movies
+      - ./assets/img/banner-dark.png:/usr/share/jellyfin/web/assets/img/banner-dark.png
+      - ./assets/img/banner-light.png:/usr/share/jellyfin/web/assets/img/banner-light.png
+      - ./assets/img/icon-transparent.png:/usr/share/jellyfin/web/assets/img/icon-transparent.png
+      # ./assets/img/:/usr/share/jellyfin/web/assets/img/
+      # ./assets/splash/:/usr/share/jellyfin/web/assets/spash/
+
+    ports:
+      - '8096:8096'
+      - '8920:8920' # Optional
+      - '7359:7359/udp' # Optional
+      - '1900:1900/udp' # Optional
+    restart: unless-stopped
+    networks:
+      - arrflix
+      - proxy
+    labels:
+      - homepage.group=Movies
+      - homepage.name=jellyfin
+      - homepage.icon=jellyfin.png
+      - homepage.href=http://home-ubuntu:8096
+      - homepage.description=Media Server
+      - homepage.widget.type=jellyfin
+      - homepage.widget.url=http://jellyfin:8096
+      - homepage.widget.key=${JELLYFIN_KEY}
+      - homepage.widget.enableBlocks=true
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.jellyfin.entrypoints=web-external
+      - traefik.http.routers.jellyfin.rule=Host(`dedsflix.${DOMAIN}`)
+      - traefik.http.middlewares.jellyfin-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.jellyfin.middlewares=jellyfin-https-redirect
+      - traefik.http.routers.jellyfin-secure.entrypoints=web-secure-external
+      - traefik.http.routers.jellyfin-secure.rule=Host(`dedsflix.${DOMAIN}`)
+      - traefik.http.routers.jellyfin-secure.tls=true
+      - traefik.http.routers.jellyfin-secure.tls.certresolver=cloudflare
+      - traefik.http.routers.jellyfin-secure.service=jellyfin
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - LOG_LEVEL=debug
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PORT=5055 #optional
+    ports:
+      - 5055:5055
+    networks:
+      - arrflix
+      - proxy
+    volumes:
+      - type: volume
+        source: configuration
+        target: /app/config
+        volume:
+          nocopy: true
+          subpath: jellyseerr
+    healthcheck:
+      test:
+        wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status
+        || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+    labels:
+      - homepage.group=Movies
+      - homepage.name=jellyseerr
+      - homepage.icon=jellyseerr.png
+      - homepage.href=http://home-ubuntu:5055
+      - homepage.description=Media Server
+      - homepage.widget.type=jellyseerr
+      - homepage.widget.url=http://jellyseerr:5055
+      - homepage.widget.key=${JELLYSEERR_KEY}
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.jellyseerr.entrypoints=web-external
+      - traefik.http.routers.jellyseerr.rule=Host(`flixrequest.${DOMAIN}`)
+      - traefik.http.middlewares.jellyseerr-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.jellyseerr.middlewares=jellyseerr-https-redirect
+      - traefik.http.routers.jellyseerr-secure.entrypoints=web-secure-external
+      - traefik.http.routers.jellyseerr-secure.rule=Host(`flixrequest.${DOMAIN}`)
+      - traefik.http.routers.jellyseerr-secure.tls=true
+      - traefik.http.routers.jellyseerr-secure.tls.certresolver=cloudflare
+      # - traefik.http.routers.jellyseerr-secure.service=jellyseerr

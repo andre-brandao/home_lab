@@ -1,0 +1,119 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+    # secrets:
+    #   - cf-token # the secret at the top of this file
+    environment:
+      # - TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
+      - CF_API_EMAIL=${CF_EMAIL}
+      - CF_DNS_API_TOKEN=${CF_TOKEN}
+    # network_mode: host
+    networks:
+      - proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      # ----
+      - /home/docker/stacks/traefik/config/traefik.yaml:/traefik.yaml:ro
+      - /home/docker/stacks/traefik/config/acme.json:/acme.json
+      - /home/docker/stacks/traefik/config/dynamic:/dynamic
+      - /home/docker/stacks/traefik/logs:/var/log/traefik
+      # ----
+      # - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+      # - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.crt:/certs/home-ubuntu.fable-company.ts.net.crt
+      # - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.key:/certs/home-ubuntu.fable-company.ts.net.key
+    ports:
+      - '80:80/tcp'
+      - '443:443/tcp'
+      - '443:443/udp'
+      - '8080:8080' # Dashboard port
+      - '8082:8082' # Metrics port
+    labels:
+      - homepage.group=Deployment
+      - homepage.name=Traefik
+      - homepage.description=Reverse proxy and load balancer
+      - homepage.icon=traefik.png
+      - homepage.href=http://arrflix:8080
+      - homepage.widget.type=traefik
+      - homepage.widget.url=http://traefik:8080
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.entrypoints=web-external'
+      - 'traefik.http.routers.traefik.rule=Host(`traefik.adob.dev`)'
+      - 'traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https'
+      - 'traefik.http.routers.traefik.middlewares=traefik-https-redirect'
+      - 'traefik.http.routers.traefik-secure.entrypoints=web-secure-external'
+      - 'traefik.http.routers.traefik-secure.rule=Host(`traefik.adob.dev`)'
+      - 'traefik.http.routers.traefik-secure.middlewares=tinyauth'
+      - 'traefik.http.routers.traefik-secure.tls=true'
+      - 'traefik.http.routers.traefik-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].main=adob.dev'
+      - 'traefik.http.routers.traefik-secure.tls.domains[0].sans=*.adob.dev'
+      - 'traefik.http.routers.traefik-secure.service=api@internal'
+
+  cloudflared:
+    container_name: cloudflare-tunnel
+    image: 'cloudflare/cloudflared:latest'
+    restart: unless-stopped
+    command: 'tunnel --no-autoupdate --metrics 0.0.0.0:2000 run'
+    environment:
+      - 'TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}'
+    ports:
+      - '2000:2000'
+    networks:
+      - proxy
+      - monitoring
+    labels:
+      - homepage.group=Deployment
+      - homepage.name=Cloudflare Tunnel
+      - homepage.description=Cloudflare Tunnel for secure access
+      - homepage.icon=cloudflare.png
+
+    # network_mode: host
+    # labels:
+    # - homepage.group=Deployment
+    # - homepage.title=Cloudflare Tunnel
+    # - homepage.icon=cloudflare.png
+    # - homepage.widget.type=cloudflared
+    # - homepage.widget.accountid=${CLOUDFLARE_ACCOUNT_ID}
+    # - homepage.widget.tunnelid=${CLOUDFLARE_TUNNEL_ID}
+    # - homepage.widget.key=${CLOUDFLARE_TUNNEL_KEY}
+
+  # cloudflare-companion:
+  #   image: tiredofit/traefik-cloudflare-companion
+  #   container_name: cloudflare-companion
+  #   volumes:
+  #     - /home/deds/cloudflare-companion/logs:/logs
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   environment:
+  #     - TIMEZONE=America/Sao_Paulo
+
+  #     - LOG_TYPE=BOTH
+  #     - LOG_LEVEL=INFO
+
+  #     - TRAEFIK_VERSION=2
+  #     - CF_EMAIL=${CF_EMAIL}
+  #     - CF_TOKEN=${CF_TOKEN}
+  #     - RC_TYPE=CNAME
+
+  #     - TARGET_DOMAIN=${CF_TARGET_DOMAIN}
+  #     - DOMAIN1=${DOMAIN1}
+  #     - DOMAIN1_ZONE_ID=${DOMAIN1_ZONE_ID}
+  #     #- DOCKER_HOST=tcp://198.51.100.32:2376
+  #     #- DOCKER_CERT_PATH=/docker-certs
+  #     #- DOCKER_TLS_VERIFY=1
+
+  #     #- TRAEFIK_FILTER_LABEL=traefik.constraint
+  #     #- TRAEFIK_FILTER=proxy-public
+  #   networks:
+  #     - dokploy-network
+  #   restart: always
