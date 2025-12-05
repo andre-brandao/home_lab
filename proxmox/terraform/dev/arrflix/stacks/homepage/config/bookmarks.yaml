@@ -1,0 +1,36 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/bookmarks
+
+- Developer:
+    - Github:
+        - abbr: GH
+          href: https://github.com/
+    - Svelte:
+        - href: https://svelte.dev/
+    - SvelteKit:
+        - href: https://kit.svelte.dev/
+    - DaisyUI:
+        - href: https://daisyui.com/
+    - Drizzle:
+        - href: https://orm.drizzle.team/docs/overview/
+    - AndreB GH:
+        - href: https://github.com/andre-brandao
+    - Railway:
+        - href: https://railway.com/dashboard
+    - ProtonMail:
+        - href: https://mail.proton.me/u/1/inbox
+
+- PUC:
+    - Canvas:
+        - href: https://canvas.pucminas.br/
+    - SGA:
+        - href: https://www.sistemas.pucminas.br/sgaaluno4/SilverStream/Pages/pgAln_LoginSSL.html
+
+- Entertainment:
+    - YouTube:
+        - abbr: YT
+          href: https://youtube.com/
+    - Reddit:
+        - abbr: RE
+          href: https://reddit.com/

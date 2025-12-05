@@ -141,6 +141,21 @@ services:
         volume:
           nocopy: true
           subpath: qui
+    environment:
+      - QUI__BASE_URL=/qui/
+    labels:
+      - homepage.group=Arr
+      - homepage.name=qui
+      - homepage.icon=qui.png
+      - homepage.href=https://${TAILNET}/qui
+      - homepage.description=Modern torrent client
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.qui-tailscale.entrypoints=web-secure
+      - traefik.http.routers.qui-tailscale.rule=Host(`${TAILNET}`) &&
+        PathPrefix(`/qui`)
+      - traefik.http.routers.qui-tailscale.tls.certresolver=vpnresolver
+      - traefik.http.services.qui.loadbalancer.server.port=7476
   # ---===PROWLARR===---
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest

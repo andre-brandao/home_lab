@@ -1,0 +1,17 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/settings/
+showStats: true
+
+layout:
+  - Calendar:
+  - Movies:
+    
+  - Media:
+  - Arr:
+    style: row
+    columns: 3
+
+providers:
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey
