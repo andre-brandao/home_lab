@@ -358,9 +358,13 @@ services:
           subpath: jellyfin
       - media_shows:/data/tvshows
       - media_movies:/data/movies
-      - ./assets/img/banner-dark.png:/usr/share/jellyfin/web/assets/img/banner-dark.png
-      - ./assets/img/banner-light.png:/usr/share/jellyfin/web/assets/img/banner-light.png
-      - ./assets/img/icon-transparent.png:/usr/share/jellyfin/web/assets/img/icon-transparent.png
+      # - ./assets/img/banner-dark.png:/usr/share/jellyfin/web/assets/img/banner-dark.png
+      # - ./assets/img/banner-light.png:/usr/share/jellyfin/web/assets/img/banner-light.png
+      # - ./assets/img/icon-transparent.png:/usr/share/jellyfin/web/assets/img/icon-transparent.png
+      - ./assets/img/banner-dark.png:/usr/share/jellyfin/web/banner-dark.31011bc0c5e6acb07879.png:ro
+      - ./assets/img/banner-light.png:/usr/share/jellyfin/web/banner-light.b113d4d1c6c07fcb73f0.png:ro
+      - ./assets/img/icon-transparent.png:/usr/share/jellyfin/web/icon-transparent.baba78f2a106d9baee83.png
+
       # ./assets/img/:/usr/share/jellyfin/web/assets/img/
       # ./assets/splash/:/usr/share/jellyfin/web/assets/spash/
 
@@ -377,7 +381,7 @@ services:
       - homepage.group=Movies
       - homepage.name=jellyfin
       - homepage.icon=jellyfin.png
-      - homepage.href=http://home-ubuntu:8096
+      - homepage.href=http://${TAILNET}:8096
       - homepage.description=Media Server
       - homepage.widget.type=jellyfin
       - homepage.widget.url=http://jellyfin:8096
@@ -431,7 +435,7 @@ services:
       - homepage.group=Movies
       - homepage.name=jellyseerr
       - homepage.icon=jellyseerr.png
-      - homepage.href=http://home-ubuntu:5055
+      - homepage.href=http://${TAILNET}:5055
       - homepage.description=Media Server
       - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://jellyseerr:5055
