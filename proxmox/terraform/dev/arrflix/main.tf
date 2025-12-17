@@ -8,8 +8,9 @@ module "monitoring" {
   vm_tags        = ["terraform", "ubuntu", "docker"]
 
   # Hardware Resources
-  cpu_cores    = 4
-  memory_mb    = 8192
+  cpu_cores    = 8
+  cpu_sockets  = 2
+  memory_mb    = 1024 * 32
   disk_size_gb = 30
 
   # Network Configuration

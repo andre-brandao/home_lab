@@ -28,9 +28,9 @@ services:
       - /home/docker/stacks/traefik/config/dynamic:/dynamic
       - /home/docker/stacks/traefik/logs:/var/log/traefik
       # ----
-      # - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
-      # - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.crt:/certs/home-ubuntu.fable-company.ts.net.crt
-      # - /var/lib/tailscale/certs/home-ubuntu.fable-company.ts.net.key:/certs/home-ubuntu.fable-company.ts.net.key
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+      - /var/lib/tailscale/certs/${TAILNET}.crt:/certs/${TAILNET}.crt
+      - /var/lib/tailscale/certs/${TAILNET}.key:/certs/${TAILNET}.key
     ports:
       - '80:80/tcp'
       - '443:443/tcp'
